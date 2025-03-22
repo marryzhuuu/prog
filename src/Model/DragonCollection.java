@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -7,9 +8,15 @@ import java.util.Vector;
  */
 public class DragonCollection {
     private Vector<Dragon> dragons;
+    private Date date;
 
     public DragonCollection() {
         dragons = new Vector<>();
+        date = new Date();
+    }
+
+    public Date getDate() {
+        return this.date;
     }
 
     public void addDragon(Dragon dragon) {
@@ -29,5 +36,7 @@ public class DragonCollection {
         return dragons;
     }
 
-    // Другие методы для сортировки, фильтрации и т.д.
+    public int getSize() {
+        return this.dragons.size();
+    }
 }

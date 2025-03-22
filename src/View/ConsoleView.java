@@ -54,10 +54,19 @@ public class ConsoleView {
      * @param initDate       дата инициализации коллекции
      * @param size           количество элементов в коллекции
      */
-    public void info(String collectionType, String initDate, int size) {
+    public void info(String collectionType, Date initDate, int size) {
         System.out.println("Тип коллекции: " + collectionType);
         System.out.println("Дата инициализации: " + initDate);
         System.out.println("Количество элементов: " + size);
+    }
+
+    /**
+     * Выводит элемент коллекции в строковом представлении.
+     *
+     * @param dragon объект Dragon
+     */
+    public void showElement(Dragon dragon) {
+        System.out.println(dragon);
     }
 
     /**
@@ -65,7 +74,7 @@ public class ConsoleView {
      *
      * @param dragons коллекция объектов Dragon
      */
-    public void show(List<Dragon> dragons) {
+    public void showCollection(List<Dragon> dragons) {
         if (dragons.isEmpty()) {
             System.out.println("Коллекция пуста.");
         } else {
@@ -73,6 +82,15 @@ public class ConsoleView {
                 System.out.println(dragon);
             }
         }
+    }
+
+    /**
+     * Выводит сообщение.
+     *
+     * @param message строка сообщения
+     */
+    public void showMessage(String message) {
+        System.out.println(message);
     }
 
     /**

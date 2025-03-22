@@ -1,4 +1,5 @@
 package Model;
+import java.util.Date;
 
 public class Dragon {
     private static long nextId=1;
@@ -22,6 +23,7 @@ public class Dragon {
         this.color = color;
         this.character = character;
         this.cave = cave;
+        this.creationDate = new Date();
     }
 
     public Dragon() {}

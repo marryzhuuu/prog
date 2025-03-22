@@ -6,12 +6,12 @@ package Model;
  */
 public class FileManager {
     public DragonCollection loadFromFile(String filename) {
-        // Реализация чтения из файла с использованием FileReader
+        // ToDo: Реализация чтения из файла с использованием FileReader
 
         return new DragonCollection();
     }
 
     public void saveToFile(String filename, DragonCollection collection) {
-        // Реализация записи в файл с использованием BufferOutputStream
+        // ToDo: Реализация записи в файл с использованием BufferOutputStream
     }
 }

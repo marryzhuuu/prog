@@ -30,14 +30,16 @@ public class DragonController {
                     consoleView.help();
                     break;
                 case "info":
-                    consoleView.info("fuck!", "fuck!!", 7);
+                    consoleView.info(dragonCollection.getClass().getSimpleName(), dragonCollection.getDate(), dragonCollection.getSize());
                     break;
                 case "show":
-                    consoleView.show(dragonCollection.getDragons());
+                    consoleView.showCollection(dragonCollection.getDragons());
                     break;
                 case "add":
                     Dragon dragon = consoleView.readDragon();
                     dragonCollection.addDragon(dragon);
+                    consoleView.showMessage("В коллекцию добавлен элемент:");
+                    consoleView.showElement(dragon);
                     break;
 //                case "update":
 //                    long id = Long.parseLong(parts[1].split(" ")[0]);
@@ -67,9 +69,9 @@ public class DragonController {
 //                    Dragon greaterDragon = consoleView.readDragon();
 //                    dragonCollection.removeGreater(greaterDragon);
 //                    break;
-//                case "history":
-//                    consoleView.displayHistory();
-//                    break;
+                case "history":
+                    consoleView.history();
+                    break;
 //                case "group_counting_by_color":
 //                    Map<Color, Long> groupedByColor = dragonCollection.groupCountingByColor();
 //                    consoleView.displayGroupedByColor(groupedByColor);
