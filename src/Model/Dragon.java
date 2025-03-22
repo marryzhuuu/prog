@@ -10,6 +10,12 @@ public class Dragon {
     private Color color; //Поле не может быть null
     private DragonCharacter character; //Поле не может быть null
     private DragonCave cave; //Поле не может быть null
+
+    public Dragon(String name, Coordinates coordinates, Integer age, String description, Color color, DragonCharacter character, DragonCave cave) {
+//        ToDo
+    }
+
+    public Dragon() {}
 }
 
 
