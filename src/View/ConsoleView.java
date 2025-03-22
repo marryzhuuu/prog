@@ -110,21 +110,145 @@ public class ConsoleView {
     }
 
     /**
-     * Читает элемент Dragon от пользователя.
+     * Метод для чтения данных дракона с консоли.
+     * Требует ввода всех полей в соответствии с ограничениями класса Dragon.
      *
-     * @return объект Dragon
+     * @return Объект Dragon с корректно заполненными полями.
      */
     public Dragon readDragon() {
-        System.out.print("Введите имя дракона: ");
-        String name = scanner.nextLine();
-        System.out.print("Введите возраст дракона: ");
-        int age = Integer.parseInt(scanner.nextLine());
-        System.out.print("Введите цвет дракона: ");
-        String color = scanner.nextLine();
-        System.out.print("Введите характер дракона: ");
-        String character = scanner.nextLine();
-        return new Dragon();
+        System.out.println("Введите данные дракона:");
+
+        // Генерация уникального id и даты создания
+//        long id = generateUniqueId();
+//        Date creationDate = new Date(); // Текущая дата и время
+
+        // Ввод имени (не может быть null или пустым)
+        String name;
+        while (true) {
+            System.out.print("Имя (не может быть пустым): ");
+            name = scanner.nextLine().trim();
+            if (!name.isEmpty()) {
+                break;
+            }
+            System.out.println("Ошибка: Имя не может быть пустым.");
+        }
+
+        // Ввод координат (не может быть null)
+        Coordinates coordinates = readCoordinates();
+
+        // Ввод возраста (должен быть больше 0 и не null)
+        Integer age;
+        while (true) {
+            System.out.print("Возраст (должен быть больше 0): ");
+            try {
+                age = Integer.parseInt(scanner.nextLine());
+                if (age > 0) {
+                    break;
+                }
+                System.out.println("Ошибка: Возраст должен быть больше 0.");
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите корректное число.");
+            }
+        }
+
+        // Ввод описания (не может быть null)
+        String description;
+        while (true) {
+            System.out.print("Описание (не может быть пустым): ");
+            description = scanner.nextLine().trim();
+            if (!description.isEmpty()) {
+                break;
+            }
+            System.out.println("Ошибка: Описание не может быть пустым.");
+        }
+
+        // Ввод цвета (не может быть null, должен быть одним из значений enum Color)
+        Color color;
+        while (true) {
+            System.out.print("Цвет (RED, ORANGE, WHITE, BROWN): ");
+            try {
+                color = Color.valueOf(scanner.nextLine().toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка: Введите корректный цвет.");
+            }
+        }
+
+        // Ввод характера (не может быть null, должен быть одним из значений enum DragonCharacter)
+        DragonCharacter character;
+        while (true) {
+            System.out.print("Характер (CUNNING, EVIL, CHAOTIC_EVIL, FICKLE, GOOD): ");
+            try {
+                character = DragonCharacter.valueOf(scanner.nextLine().toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка: Введите корректный характер.");
+            }
+        }
+
+        // Ввод пещеры (не может быть null)
+        DragonCave cave = readDragonCave();
+
+        // Создание и возврат объекта Dragon
+        return new Dragon(name, coordinates, age, description, color, character, cave);
     }
+
+    /**
+     * Метод для чтения координат дракона.
+     *
+     * @return Объект Coordinates с корректно заполненными полями.
+     */
+    private Coordinates readCoordinates() {
+        double x, y;
+        while (true) {
+            System.out.print("Координата X: ");
+            try {
+                x = Double.parseDouble(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите корректное число.");
+            }
+        }
+        while (true) {
+            System.out.print("Координата Y: ");
+            try {
+                y = Double.parseDouble(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите корректное число.");
+            }
+        }
+        return new Coordinates(x, y);
+    }
+
+    /**
+     * Метод для чтения данных пещеры дракона.
+     *
+     * @return Объект DragonCave с корректно заполненными полями.
+     */
+    private DragonCave readDragonCave() {
+        int depth;
+        while (true) {
+            System.out.print("Глубина пещеры: ");
+            try {
+                depth = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите целое число.");
+            }
+        }
+        return new DragonCave(depth);
+    }
+
+//    /**
+//     * Метод для генерации уникального id.
+//     *
+//     * @return Уникальный id.
+//     */
+//    private long generateUniqueId() {
+//        // Здесь можно использовать, например, текущее время в миллисекундах
+//        return System.currentTimeMillis();
+//    }
 
     /**
      * Читает ID от пользователя.
