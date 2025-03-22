@@ -6,6 +6,8 @@ import Model.DragonCollection;
 import Model.FileManager;
 import View.ConsoleView;
 
+import java.io.IOException;
+
 public class DragonController {
     private DragonCollection dragonCollection;
     private ConsoleView consoleView;
@@ -17,8 +19,13 @@ public class DragonController {
         this.fileManager = fileManager;
     }
 
-    public void start() {
+    public void start() throws IOException {
         String filename = System.getenv("DRAGON_FILE");
+
+        if (filename == null || filename.isEmpty()) {
+            filename = "dragon_collection.json";
+        }
+
         dragonCollection = fileManager.loadFromFile(filename);
 
         while (true) {
@@ -30,7 +37,7 @@ public class DragonController {
                     consoleView.help();
                     break;
                 case "info":
-                    consoleView.info(dragonCollection.getClass().getSimpleName(), dragonCollection.getDate(), dragonCollection.getSize());
+                    consoleView.info(dragonCollection.getClass().getSimpleName(), dragonCollection.getDate(), dragonCollection.size());
                     break;
                 case "show":
                     consoleView.showCollection(dragonCollection.getDragons());
@@ -53,10 +60,10 @@ public class DragonController {
 //                case "clear":
 //                    dragonCollection.clear();
 //                    break;
-//                case "save":
-//                    fileManager.saveToFile(filename, dragonCollection);
-//                    break;
-//                case "execute_script":
+                case "save":
+                    fileManager.saveToFile(filename, dragonCollection);
+                    break;
+                case "execute_script":
 //                    fileManager.executeScript(parts[1]);
 //                    break;
                 case "exit":

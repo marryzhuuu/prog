@@ -26,7 +26,41 @@ public class Dragon {
         this.creationDate = new Date();
     }
 
-    public Dragon() {}
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public java.util.Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public DragonCharacter getCharacter() {
+        return character;
+    }
+
+    public DragonCave getCave() {
+        return cave;
+    }
 }
 
 

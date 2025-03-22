@@ -9,4 +9,7 @@ public class DragonCave {
         this.depth = depth;
     }
 
+    public int getDepth() {
+        return depth;
+    }
 }

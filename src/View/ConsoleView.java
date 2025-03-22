@@ -134,11 +134,20 @@ public class ConsoleView {
      * @return Объект Dragon с корректно заполненными полями.
      */
     public Dragon readDragon() {
+
+//        ToDo: remove!!!!!!!!!!!
+        return new Dragon(
+            "dragon",
+            new Coordinates(1.0, 1.0),
+            100,
+            "dragon description",
+                Color.valueOf("RED"),
+            DragonCharacter.valueOf("GOOD"),
+                new DragonCave(1000)
+        );
+/*
         System.out.println("Введите данные дракона:");
 
-        // Генерация уникального id и даты создания
-//        long id = generateUniqueId();
-//        Date creationDate = new Date(); // Текущая дата и время
 
         // Ввод имени (не может быть null или пустым)
         String name;
@@ -209,6 +218,8 @@ public class ConsoleView {
 
         // Создание и возврат объекта Dragon
         return new Dragon(name, coordinates, age, description, color, character, cave);
+
+ */
     }
 
     /**

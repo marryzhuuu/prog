@@ -1,6 +1,8 @@
 package Model;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.Vector;
 
 /**
@@ -27,16 +29,24 @@ public class DragonCollection {
 //        dragons.removeIf(dragon -> dragon.getId() == id);
     }
 
-    public Dragon findDragonById(int id) {
-//        return dragons.stream().filter(dragon -> dragon.getId() == id).findFirst().orElse(null);
-        return null;
+    public Dragon findDragonById(long id) {
+//        Iterator<Dragon> iterator = dragons.iterator();
+//        while (iterator.hasNext()) {
+//            Dragon dragon = iterator.next();
+//            if (dragon.getId() == id) {
+//                return dragon; // Возвращаем найденный объект
+//            }
+//        }
+//        return null; // Если объект не найден
+        Dragon dragon = dragons.stream().filter(d -> d.getId() == id).findFirst().orElse(null);
+        return dragon;
     }
 
     public Vector<Dragon> getDragons() {
         return dragons;
     }
 
-    public int getSize() {
+    public int size() {
         return this.dragons.size();
     }
 }

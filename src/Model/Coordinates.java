@@ -10,4 +10,12 @@ public class Coordinates {
         this.x = x;
         this.y = (float) y;
     }
+
+    double getX() {
+        return this.x;
+    }
+
+    double getY() {
+        return this.y;
+    }
 }
