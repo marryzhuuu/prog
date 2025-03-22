@@ -7,6 +7,7 @@ import Model.FileManager;
 import View.ConsoleView;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 public class DragonController {
     private DragonCollection dragonCollection;
@@ -19,7 +20,7 @@ public class DragonController {
         this.fileManager = fileManager;
     }
 
-    public void start() throws IOException {
+    public void start() throws IOException, ParseException {
         String filename = System.getenv("DRAGON_FILE");
 
         if (filename == null || filename.isEmpty()) {

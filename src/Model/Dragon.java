@@ -26,6 +26,19 @@ public class Dragon {
         this.creationDate = new Date();
     }
 
+    public Dragon(long id, String name, Coordinates coordinates, Date date, Integer age, String description, Color color, DragonCharacter character, DragonCave cave) {
+        this.id = id;
+        nextId = Math.max(nextId, id+1);
+        this.name = name;
+        this.coordinates = coordinates;
+        this.age = age;
+        this.description = description;
+        this.color = color;
+        this.character = character;
+        this.cave = cave;
+        this.creationDate = date;
+    }
+
     public long getId() {
         return id;
     }
