@@ -16,6 +16,6 @@ public class Main {
         FileManager fileManager = new FileManager();
 
         DragonController controller = new DragonController(dragonCollection, consoleView, fileManager);
-        controller.start();
+        controller.run();
     }
 }
