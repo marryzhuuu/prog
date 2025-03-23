@@ -225,11 +225,11 @@ public class FileManager {
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("["); // Начало JSON-массива
 
-        for (int i = 1; i <= collection.size(); i++) {
-            Dragon dragon = collection.findDragonById(i);
+        int i = 0;
+        for (Dragon dragon: collection.getDragons()) {
             jsonBuilder.append(toJson(dragon)); // Преобразуем дракона в JSON
 
-            if (i < collection.size()) {
+            if (i++ <= collection.size()) {
                 jsonBuilder.append(","); // Добавляем запятую между элементами массива
             }
         }

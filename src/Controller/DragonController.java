@@ -1,6 +1,7 @@
 package Controller;
 
 
+import Model.Color;
 import Model.Dragon;
 import Model.DragonCollection;
 import Model.FileManager;
@@ -8,6 +9,7 @@ import View.ConsoleView;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 import java.util.Optional;
 
 public class DragonController {
@@ -87,21 +89,29 @@ public class DragonController {
 //                    break;
                 case "exit":
                     return;
-//                case "add_if_max":
-//                    Dragon maxDragon = consoleView.readDragon();
-//                    dragonCollection.addIfMax(maxDragon);
-//                    break;
-//                case "remove_greater":
-//                    Dragon greaterDragon = consoleView.readDragon();
-//                    dragonCollection.removeGreater(greaterDragon);
-//                    break;
+                case "add_if_max":
+                    Dragon newDragon = consoleView.readDragon();
+                    Dragon addedDragon = dragonCollection.addIfMax(newDragon);
+                    if(addedDragon != null) {
+                        consoleView.showMessage("Добавлен элемент:\n" + addedDragon);
+                    }
+                    else {
+                        consoleView.showMessage("В коллекции есть драконы не младше");
+                    }
+                    break;
+                case "remove_greater":
+                    Dragon greaterDragon = consoleView.readDragon();
+                    int initialSize = dragonCollection.size();
+                    int newSize = dragonCollection.removeGreater(greaterDragon);
+                    consoleView.showMessage("Удалено " + (initialSize-newSize) + " элементов");
+                    break;
                 case "history":
                     consoleView.history();
                     break;
-//                case "group_counting_by_color":
-//                    Map<Color, Long> groupedByColor = dragonCollection.groupCountingByColor();
-//                    consoleView.displayGroupedByColor(groupedByColor);
-//                    break;
+                case "group_counting_by_color":
+                    Map<Color, Long> groupedByColor = dragonCollection.groupCountingByColor();
+                    consoleView.displayGroupedByColor(groupedByColor);
+                    break;
 //                case "count_greater_than_age":
 //                    int age = Integer.parseInt(parts[1]);
 //                    int count = dragonCollection.countGreaterThanAge(age);

@@ -41,8 +41,8 @@ public class ConsoleView {
         System.out.println("save : сохранить коллекцию в файл");
         System.out.println("execute_script file_name : выполнить скрипт из файла");
         System.out.println("exit : завершить программу");
-        System.out.println("add_if_max {element} : добавить элемент, если он больше максимального");
-        System.out.println("remove_greater {element} : удалить элементы, превышающие заданный");
+        System.out.println("add_if_max {element} : добавить элемент, если он больше максимального по возрасту");
+        System.out.println("remove_greater {element} : удалить элементы, превышающие заданный по возрасту");
         System.out.println("history : вывести последние 15 команд");
         System.out.println("group_counting_by_color : сгруппировать элементы по цвету");
         System.out.println("count_greater_than_age age : вывести количество элементов с age больше заданного");
@@ -449,9 +449,9 @@ public class ConsoleView {
      *
      * @param colorCountMap карта с количеством элементов по цвету
      */
-    public void groupCountingByColor(java.util.Map<String, Long> colorCountMap) {
+    public void displayGroupedByColor(java.util.Map<Color, Long> colorCountMap) {
         System.out.println("Количество элементов по цвету:");
-        for (java.util.Map.Entry<String, Long> entry : colorCountMap.entrySet()) {
+        for (java.util.Map.Entry<Color, Long> entry : colorCountMap.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
     }

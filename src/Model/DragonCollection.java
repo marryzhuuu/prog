@@ -1,9 +1,7 @@
 package Model;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Класс DragonCollection управляет коллекцией объектов Dragon.
@@ -49,5 +47,26 @@ public class DragonCollection {
 
     public void clear() {
         this.dragons.clear();
+    }
+
+    public Dragon addIfMax(Dragon dragon) {
+        Dragon oldestDragon = Collections.max(dragons, Comparator.comparingInt(Dragon::getAge));
+        if(dragon.getAge() > oldestDragon.getAge()) {
+            dragons.add(dragon);
+            return dragon;
+        }
+        return null;
+    }
+
+    public int removeGreater(Dragon dragon) {
+        int age = dragon.getAge();
+        dragons.removeIf(d -> d.getAge() > age);
+        return this.size();
+    }
+
+    public Map<Color, Long> groupCountingByColor() {
+        Map<Color, Long> dragonsByColor = dragons.stream()
+                .collect(Collectors.groupingBy(Dragon::getColor, Collectors.counting()));
+        return dragonsByColor;
     }
 }
