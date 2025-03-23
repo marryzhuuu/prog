@@ -25,19 +25,16 @@ public class DragonCollection {
         dragons.add(dragon);
     }
 
+    public Dragon updateDragon(int id, Dragon updated) {
+        Dragon dragon = findDragonById(id);
+        return dragon.updateFields(updated);
+    }
+
     public void removeDragon(int id) {
 //        dragons.removeIf(dragon -> dragon.getId() == id);
     }
 
-    public Dragon findDragonById(long id) {
-//        Iterator<Dragon> iterator = dragons.iterator();
-//        while (iterator.hasNext()) {
-//            Dragon dragon = iterator.next();
-//            if (dragon.getId() == id) {
-//                return dragon; // Возвращаем найденный объект
-//            }
-//        }
-//        return null; // Если объект не найден
+    public Dragon findDragonById(int id) {
         Dragon dragon = dragons.stream().filter(d -> d.getId() == id).findFirst().orElse(null);
         return dragon;
     }

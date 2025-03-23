@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 
+import java.util.Optional;
+
 /**
  * Класс ConsoleView отвечает за взаимодействие с пользователем через консоль.
  * Реализует выполнение набора команд для управления коллекцией объектов Dragon.
@@ -135,17 +137,6 @@ public class ConsoleView {
      */
     public Dragon readDragon() {
 
-//        ToDo: remove!!!!!!!!!!!
-        return new Dragon(
-            "dragon",
-            new Coordinates(1.0, 1.0),
-            100,
-            "dragon description",
-                Color.valueOf("RED"),
-            DragonCharacter.valueOf("GOOD"),
-                new DragonCave(1000)
-        );
-/*
         System.out.println("Введите данные дракона:");
 
 
@@ -161,7 +152,7 @@ public class ConsoleView {
         }
 
         // Ввод координат (не может быть null)
-        Coordinates coordinates = readCoordinates();
+        Coordinates coordinates = readCoordinates(Optional.empty());
 
         // Ввод возраста (должен быть больше 0 и не null)
         Integer age;
@@ -214,12 +205,125 @@ public class ConsoleView {
         }
 
         // Ввод пещеры (не может быть null)
-        DragonCave cave = readDragonCave();
+        DragonCave cave = readDragonCave(Optional.empty());
 
         // Создание и возврат объекта Dragon
         return new Dragon(name, coordinates, age, description, color, character, cave);
 
- */
+    }
+
+
+    /**
+     * Метод для чтения данных дракона с консоли.
+     * Осуществляет ввод полей класса Dragon.
+     *
+     * @param dragon исходный элемент коллекции
+     * @return Объект Dragon с корректно заполненными полями.
+     */
+    public Dragon readDragonParams(Dragon dragon) {
+
+        System.out.println("Введите данные дракона для изменения:");
+
+
+        // Ввод имени (не может быть null или пустым)
+        String name;
+        String currentName = dragon.getName();
+        System.out.println("Текущее имя: " + currentName);
+        name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            name = currentName;
+        }
+        System.out.println("Новое имя: " + name);
+
+        // Ввод координат (не может быть null)
+        Coordinates currentCoordinates = dragon.getCoordinates();
+        System.out.println("Текущие координаты: " + dragon.getCoordinates());
+        Coordinates coordinates = readCoordinates(Optional.of(currentCoordinates));
+        System.out.println("Новые координаты: " + coordinates);
+
+        // Ввод возраста (должен быть больше 0 и не null)
+        int currentAge = dragon.getAge();
+        int age=currentAge;
+        System.out.println("Текущий возраст: " + currentAge);
+        while(true) {
+            try {
+                String ageString = scanner.nextLine().trim();
+                if (ageString.isEmpty()) {
+                    break;
+                }
+                age = Integer.parseInt(ageString);
+                if (age > 0) {
+                    break;
+                }
+                System.out.println("Ошибка: Возраст должен быть больше 0.");
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Возраст (должен быть больше 0): ");
+            }
+
+        }
+        System.out.println("Новый возраст: " + age);
+
+
+        // Ввод описания (не может быть null)
+        String currentDescription = dragon.getDescription();
+        String description;
+        System.out.println("Текущее описание: " + currentDescription);
+        description = scanner.nextLine().trim();
+        if (description.isEmpty()) {
+            description=currentDescription;
+        }
+        System.out.println("Новое описание: " + description);
+
+        // Ввод цвета (не может быть null, должен быть одним из значений enum Color)
+        Color color;
+        Color currentColor=dragon.getColor();
+        System.out.println("Текущий цвет: " + dragon.getColor());
+        while (true) {
+            System.out.print("Цвет (RED, ORANGE, WHITE, BROWN): ");
+            try {
+                String colorString = scanner.nextLine().trim();
+                if (colorString.isEmpty()) {
+                    color = currentColor;
+                    break;
+                }
+                color = Color.valueOf(colorString.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка: Введите корректный цвет.");
+            }
+        }
+        System.out.println("Новый цвет: " + color);
+
+        // Ввод характера (не может быть null, должен быть одним из значений enum DragonCharacter)
+        DragonCharacter character;
+        DragonCharacter currentCharacter=dragon.getCharacter();
+        System.out.println("Текущий характер: " + currentCharacter);
+        while (true) {
+            System.out.print("Характер (CUNNING, EVIL, GOOD, CHAOTIC_EVIL, FICKLE): ");
+            try {
+                String characterString = scanner.nextLine().trim();
+                if (characterString.isEmpty()) {
+                    character = currentCharacter;
+                    break;
+                }
+                character = DragonCharacter.valueOf(characterString.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка: Введите корректный характер.");
+            }
+        }
+        System.out.println("Новый характер: " + character);
+
+        // Ввод пещеры (не может быть null)
+        DragonCave currentCave = dragon.getCave();
+        System.out.println("Текущая пещера: " + dragon.getCave());
+        DragonCave cave = readDragonCave(Optional.of(currentCave));
+        System.out.println("Новая пещера: " + cave);
+
+        // Создание и возврат объекта Dragon
+        return new Dragon(name, coordinates, age, description, color, character, cave);
+
     }
 
     /**
@@ -227,12 +331,17 @@ public class ConsoleView {
      *
      * @return Объект Coordinates с корректно заполненными полями.
      */
-    private Coordinates readCoordinates() {
+    private Coordinates readCoordinates(Optional<Coordinates> current) {
         double x, y;
         while (true) {
             System.out.print("Координата X: ");
             try {
-                x = Double.parseDouble(scanner.nextLine());
+                String coordString = scanner.nextLine().trim();
+                if (coordString.isEmpty()) {
+                    x = current.orElse(null).getX();
+                    break;
+                }
+                x = Double.parseDouble(coordString);
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: Введите корректное число.");
@@ -241,7 +350,12 @@ public class ConsoleView {
         while (true) {
             System.out.print("Координата Y: ");
             try {
-                y = Double.parseDouble(scanner.nextLine());
+                String coordString = scanner.nextLine().trim();
+                if (coordString.isEmpty()) {
+                    y = current.orElse(null).getY();
+                    break;
+                }
+                y = Double.parseDouble(coordString);
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: Введите корректное число.");
@@ -255,29 +369,41 @@ public class ConsoleView {
      *
      * @return Объект DragonCave с корректно заполненными полями.
      */
-    private DragonCave readDragonCave() {
+    private DragonCave readDragonCave(Optional<DragonCave> current) {
         int depth;
         while (true) {
             System.out.print("Глубина пещеры: ");
             try {
-                depth = Integer.parseInt(scanner.nextLine());
+                String depthString = scanner.nextLine().trim();
+                if (depthString.isEmpty()) {
+                    depth = current.orElse(null).getDepth();
+                    break;
+                }
+                depth = Integer.parseInt(depthString);
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: Введите целое число.");
             }
         }
-        return new DragonCave(depth);
-    }
 
-//    /**
-//     * Метод для генерации уникального id.
-//     *
-//     * @return Уникальный id.
-//     */
-//    private long generateUniqueId() {
-//        // Здесь можно использовать, например, текущее время в миллисекундах
-//        return System.currentTimeMillis();
-//    }
+        Long treasures;
+        while (true) {
+            System.out.print("Количество сокровищ: ");
+            try {
+                String treasuresString = scanner.nextLine().trim();
+                if (treasuresString.isEmpty()) {
+                    treasures = current.orElse(null).getTreasures();
+                    break;
+                }
+                treasures = Long.parseLong(treasuresString);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите целое число.");
+            }
+        }
+
+        return new DragonCave(depth, treasures);
+    }
 
     /**
      * Читает ID от пользователя.

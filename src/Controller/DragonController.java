@@ -8,6 +8,7 @@ import View.ConsoleView;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Optional;
 
 public class DragonController {
     private DragonCollection dragonCollection;
@@ -49,11 +50,21 @@ public class DragonController {
                     consoleView.showMessage("В коллекцию добавлен элемент:");
                     consoleView.showElement(dragon);
                     break;
-//                case "update":
-//                    long id = Long.parseLong(parts[1].split(" ")[0]);
-//                    Dragon updatedDragon = consoleView.readDragon();
-//                    dragonCollection.updateDragon(id, updatedDragon);
-//                    break;
+                case "update":
+                    try {
+                        int id = Integer.parseInt(parts[1].split(" ")[0]);
+                        dragon = dragonCollection.findDragonById(id);
+                        if (dragon == null) {
+                            throw new Exception();
+                        }
+                        Dragon updatedDragon = consoleView.readDragonParams(dragon);
+                        dragon = dragonCollection.updateDragon(id, updatedDragon);
+                        consoleView.showMessage("Обновленный элемент:\n" + dragon);
+                        break;
+                    }
+                    catch (Exception e) {
+                        consoleView.showMessage("usage: update ID, где ID - корректный индекс элемента в коллекции");
+                    }
 //                case "remove_by_id":
 //                    long removeId = Long.parseLong(parts[1]);
 //                    dragonCollection.removeDragonById(removeId);

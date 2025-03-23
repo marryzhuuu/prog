@@ -11,11 +11,15 @@ public class Coordinates {
         this.y = (float) y;
     }
 
-    double getX() {
+    public double getX() {
         return this.x;
     }
 
-    double getY() {
+    public double getY() {
         return this.y;
+    }
+
+    public String toString() {
+        return "X: " + x + "; Y: " + y;
     }
 }

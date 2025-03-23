@@ -2,9 +2,9 @@ package Model;
 import java.util.Date;
 
 public class Dragon {
-    private static long nextId=1;
+    private static int nextId=1;
 
-    private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+    private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
     private java.util.Date creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -26,7 +26,7 @@ public class Dragon {
         this.creationDate = new Date();
     }
 
-    public Dragon(long id, String name, Coordinates coordinates, Date date, Integer age, String description, Color color, DragonCharacter character, DragonCave cave) {
+    public Dragon(int id, String name, Coordinates coordinates, Date date, Integer age, String description, Color color, DragonCharacter character, DragonCave cave) {
         this.id = id;
         nextId = Math.max(nextId, id+1);
         this.name = name;
@@ -39,7 +39,7 @@ public class Dragon {
         this.creationDate = date;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -73,6 +73,44 @@ public class Dragon {
 
     public DragonCave getCave() {
         return cave;
+    }
+
+    public Dragon updateFields(Dragon updated) {
+        name = updated.name;
+        coordinates = updated.coordinates;
+        age = updated.age;
+        description = updated.description;
+        color = updated.color;
+        character = updated.character;
+        cave = updated.cave;
+
+        return this;
+    }
+
+    public String toString() {
+        return String.format(
+                """
+                 id: %d,
+                 name: %s,
+                 coordinates: %s,
+                 creationDate: %s,
+                 age: %d,
+                 description: %s,
+                 color: %s,
+                 character: %s,
+                 cave: %s
+                 """,
+                id,
+                name, // Экранируем строки
+                coordinates,
+                creationDate,
+                age,
+                description, // Экранируем строки
+                color,
+                character,
+                cave
+        );
+
     }
 }
 

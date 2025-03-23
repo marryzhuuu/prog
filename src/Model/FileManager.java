@@ -104,7 +104,7 @@ public class FileManager {
     private Dragon parseDragon(String json) throws ParseException {
         Map<String, String> fields = parseJsonObject(json);
 
-        long id = Long.parseLong(fields.get("id"));
+        int id = Integer.parseInt(fields.get("id"));
         String name = fields.get("name").replace("\"", "");
         Coordinates coordinates = parseCoordinates(fields.get("coordinates"));
         Date creationDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(fields.get("creationDate").replace("\"", ""));
@@ -209,7 +209,8 @@ public class FileManager {
     private DragonCave parseDragonCave(String json) throws ParseException {
         Map<String, String> fields = parseJsonObject(json);
         int depth = Integer.parseInt(fields.get("depth"));
-        return new DragonCave(depth);
+        Long treasures = Long.parseLong(fields.get("treasures"));
+        return new DragonCave(depth, treasures);
     }
 
     /**
@@ -261,7 +262,7 @@ public class FileManager {
                         "\"description\": \"%s\", " +
                         "\"color\": \"%s\", " +
                         "\"character\": \"%s\", " +
-                        "\"cave\": {\"depth\": %d}" +
+                        "\"cave\": {\"depth\": %d, \"treasures\": %d}" +
                         "}",
                 dragon.getId(),
                 escapeJson(dragon.getName()), // Экранируем строки
@@ -272,7 +273,8 @@ public class FileManager {
                 escapeJson(dragon.getDescription()), // Экранируем строки
                 dragon.getColor(),
                 dragon.getCharacter(),
-                dragon.getCave().getDepth()
+                dragon.getCave().getDepth(),
+                dragon.getCave().getTreasures()
         );
     }
 
