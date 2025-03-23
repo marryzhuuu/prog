@@ -65,13 +65,20 @@ public class DragonController {
                     catch (Exception e) {
                         consoleView.showMessage("usage: update ID, где ID - корректный индекс элемента в коллекции");
                     }
-//                case "remove_by_id":
-//                    long removeId = Long.parseLong(parts[1]);
-//                    dragonCollection.removeDragonById(removeId);
-//                    break;
-//                case "clear":
-//                    dragonCollection.clear();
-//                    break;
+                case "remove_by_id":
+                    try {
+                        int id = Integer.parseInt(parts[1].split(" ")[0]);
+                        dragonCollection.removeDragon(id);
+                        consoleView.showMessage("Удален элемент: " + id);
+                        break;
+                    }
+                    catch (Exception e) {
+                        consoleView.showMessage("usage: remove_by_id ID, где ID - корректный индекс элемента в коллекции");
+                    }
+                case "clear":
+                    dragonCollection.clear();
+                    consoleView.showMessage("Коллекция очищена");
+                    break;
                 case "save":
                     fileManager.saveToFile(filename, dragonCollection);
                     break;

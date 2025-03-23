@@ -31,7 +31,7 @@ public class DragonCollection {
     }
 
     public void removeDragon(int id) {
-//        dragons.removeIf(dragon -> dragon.getId() == id);
+        dragons.removeIf(dragon -> dragon.getId() == id);
     }
 
     public Dragon findDragonById(int id) {
@@ -45,5 +45,9 @@ public class DragonCollection {
 
     public int size() {
         return this.dragons.size();
+    }
+
+    public void clear() {
+        this.dragons.clear();
     }
 }
