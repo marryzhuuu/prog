@@ -48,14 +48,17 @@ public class DragonController {
                     int id = Integer.parseInt(parts[1].split(" ")[0]);
                     dragon = dragonCollection.findDragonById(id);
                     if (dragon == null) {
-                        throw new Exception();
+                        throw new NumberFormatException();
                     }
                     Dragon updatedDragon = consoleView.readDragonParams(dragon);
                     dragon = dragonCollection.updateDragon(id, updatedDragon);
                     consoleView.showMessage("Обновленный элемент:\n" + dragon);
                 }
-                catch (Exception e) {
+                catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                     consoleView.showMessage("usage: update ID, где ID - корректный индекс элемента в коллекции");
+                }
+                catch (IllegalArgumentException e) {
+                    consoleView.showMessage(e.getMessage());
                 }
                 break;
             case "remove_by_id":

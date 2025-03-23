@@ -8,6 +8,9 @@ public class Coordinates {
 
     public Coordinates(double x, double y) {
         this.x = x;
+        if(y <= -948) {
+            throw new IllegalArgumentException("Координата Y должна быть больше -948");
+        }
         this.y = (float) y;
     }
 
