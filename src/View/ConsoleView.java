@@ -457,22 +457,13 @@ public class ConsoleView {
     }
 
     /**
-     * Выводит количество элементов, возраст которых больше заданного.
-     *
-     * @param count количество элементов
-     */
-    public void countGreaterThanAge(int count) {
-        System.out.println("Количество элементов с возрастом больше заданного: " + count);
-    }
-
-    /**
-     * Выводит элементы, значение поля character которых меньше заданного.
+     * Выводит элементы
      *
      * @param dragons список драконов
      */
-    public void filterLessThanCharacter(List<Dragon> dragons) {
+    public void displayElementList(List<Dragon> dragons) {
         if (dragons.isEmpty()) {
-            System.out.println("Нет элементов с character меньше заданного.");
+            System.out.println("Нет элементов ");
         } else {
             for (Dragon dragon : dragons) {
                 System.out.println(dragon);

@@ -69,4 +69,16 @@ public class DragonCollection {
                 .collect(Collectors.groupingBy(Dragon::getColor, Collectors.counting()));
         return dragonsByColor;
     }
+
+    public long countGreaterThanAge(long minAge) {
+        return dragons.stream()
+                .filter(dragon -> dragon.getAge() > minAge)
+                .count();
+    }
+
+    public List<Dragon> filterLessThanCharacter(DragonCharacter character) {
+        return dragons.stream()
+                .filter(dragon -> dragon.getCharacter().compareTo(character) < 0)
+                .collect(Collectors.toList());
+    }
 }

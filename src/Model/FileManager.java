@@ -234,7 +234,7 @@ public class FileManager {
             }
         }
 
-        jsonBuilder.append("]"); // Конец JSON-массива
+       jsonBuilder.append("]"); // Конец JSON-массива
 
         // Записываем JSON в файл с помощью BufferedOutputStream
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(filename))) {

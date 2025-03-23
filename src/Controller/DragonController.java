@@ -1,14 +1,12 @@
 package Controller;
 
 
-import Model.Color;
-import Model.Dragon;
-import Model.DragonCollection;
-import Model.FileManager;
+import Model.*;
 import View.ConsoleView;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -62,21 +60,21 @@ public class DragonController {
                         Dragon updatedDragon = consoleView.readDragonParams(dragon);
                         dragon = dragonCollection.updateDragon(id, updatedDragon);
                         consoleView.showMessage("Обновленный элемент:\n" + dragon);
-                        break;
                     }
                     catch (Exception e) {
                         consoleView.showMessage("usage: update ID, где ID - корректный индекс элемента в коллекции");
                     }
+                    break;
                 case "remove_by_id":
                     try {
                         int id = Integer.parseInt(parts[1].split(" ")[0]);
                         dragonCollection.removeDragon(id);
                         consoleView.showMessage("Удален элемент: " + id);
-                        break;
                     }
                     catch (Exception e) {
                         consoleView.showMessage("usage: remove_by_id ID, где ID - корректный индекс элемента в коллекции");
                     }
+                    break;
                 case "clear":
                     dragonCollection.clear();
                     consoleView.showMessage("Коллекция очищена");
@@ -112,18 +110,31 @@ public class DragonController {
                     Map<Color, Long> groupedByColor = dragonCollection.groupCountingByColor();
                     consoleView.displayGroupedByColor(groupedByColor);
                     break;
-//                case "count_greater_than_age":
-//                    int age = Integer.parseInt(parts[1]);
-//                    int count = dragonCollection.countGreaterThanAge(age);
-//                    consoleView.displayCountGreaterThanAge(count);
-//                    break;
-//                case "filter_less_than_character":
-//                    DragonCharacter character = DragonCharacter.valueOf(parts[1].toUpperCase());
-//                    List<Dragon> filteredDragons = dragonCollection.filterLessThanCharacter(character);
-//                    consoleView.displayFilteredByCharacter(filteredDragons);
-//                    break;
+                case "count_greater_than_age":
+                    try {
+                        long age = Long.parseLong(parts[1].split(" ")[0]);
+                        if (age <= 0) {
+                            throw new Exception();
+                        }
+                        long count = dragonCollection.countGreaterThanAge(age);
+                        consoleView.showMessage("Количество элементов старше " + age + ": " + count);
+                    }
+                    catch (Exception e) {
+                        consoleView.showMessage("usage: count_greater_than_age age, где age - корректный возраст элемента");
+                    }
+                    break;
+                case "filter_less_than_character":
+                    try {
+                        String characterString = parts[1].split(" ")[0];
+                        DragonCharacter character = DragonCharacter.valueOf(characterString.toUpperCase());
+                        List<Dragon> filteredDragons = dragonCollection.filterLessThanCharacter(character);
+                        consoleView.displayElementList(filteredDragons);
+                    } catch (Exception e) {
+                        System.out.println("Ошибка: Введите корректный характер (CUNNING, EVIL, CHAOTIC_EVIL, FICKLE, GOOD):");
+                    }
+                    break;
                 default:
-//                    consoleView.showMessage("Неизвестная команда");
+                    consoleView.showMessage("Неизвестная команда");
             }
         }
     }
