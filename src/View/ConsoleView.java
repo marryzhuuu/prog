@@ -17,7 +17,10 @@ import java.util.Optional;
  * Реализует выполнение набора команд для управления коллекцией объектов Dragon.
  */
 public class ConsoleView {
+    private static final String commandPrompt = "$ ";
+    private static final String scriptPrompt = "> ";
     private Scanner scanner;
+    private static boolean fileMode = false;
     private Stack<String> commandHistory;
     private static final int HISTORY_SIZE = 15;
 
@@ -44,10 +47,19 @@ public class ConsoleView {
 
     public Scanner getScanner() { return this.scanner; }
 
-    public void commandPrompt() { System.out.print("$"); }
+    public void setScanner(Scanner scanner) { this.scanner = scanner;}
 
-    public void inputPrompt() { System.out.print(">"); }
+    public boolean getFileMode() { return fileMode; }
 
+    public void setFileMode(boolean fileMode) { ConsoleView.fileMode = fileMode;}
+
+    public void commandPrompt() { System.out.print(commandPrompt); }
+
+    public void scriptPrompt() { System.out.print(scriptPrompt); }
+
+    public String getCommandPrompt() { return commandPrompt;}
+
+    public String getScriptPrompt() { return scriptPrompt; }
 
     /**
      * Выводит справку по доступным командам.

@@ -32,7 +32,7 @@ public class Main {
             addCommand("group_counting_by_color", new GroupCountingByColor(consoleView, dragonCollection));
             addCommand("count_greater_than_age", new CountGreaterThanAge(consoleView, dragonCollection));
             addCommand("filter_less_than_character", new FilterLessThanCharacter(consoleView, dragonCollection));
-//            register("execute_script", new ExecuteScript(console));
+            addCommand("execute_script", new ExecuteScript(consoleView));
         }};
 
         DragonController controller = new DragonController(dragonCollection, consoleView, fileManager, commandManager);
