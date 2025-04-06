@@ -30,6 +30,7 @@ public class Save extends Command {
         }
 
         collection.save();
+        console.println("Коллекция сохранена");
         return true;
     }
 }
