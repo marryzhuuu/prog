@@ -11,6 +11,9 @@ import java.util.Map;
 public class CommandManager {
     private final Map<String, Command> commands = new HashMap<>();
     private final List<String> commandHistory = new ArrayList<>();
+    private static final int HISTORY_SIZE = 15;
+
+    public static int getHistorySize() {return HISTORY_SIZE;}
 
     /**
      * Добавляет команду.
@@ -32,7 +35,7 @@ public class CommandManager {
      * @return История команд.
      */
     public List<String> getCommandHistory() {
-        return commandHistory;
+        return commandHistory.subList(Math.max(0, commandHistory.size() - 10), commandHistory.size());
     }
 
     /**

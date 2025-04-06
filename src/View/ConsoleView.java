@@ -27,14 +27,6 @@ public class ConsoleView {
     }
 
     /**
-     * Выводит obj.toString() в консоль
-     * @param obj Объект для печати
-     */
-    public void print(Object obj) {
-        System.out.print(obj);
-    }
-
-    /**
      * Выводит obj.toString() + \n в консоль
      * @param obj Объект для печати
      */
@@ -124,30 +116,6 @@ public class ConsoleView {
      */
     public void showMessage(String message) {
         System.out.println(message);
-    }
-
-    /**
-     * Читает команду от пользователя.
-     *
-     * @return введенная команда
-     */
-    public String readCommand() {
-        System.out.print("Введите команду: ");
-        String command = scanner.nextLine();
-        addToHistory(command);
-        return command;
-    }
-
-    /**
-     * Добавляет команду в историю.
-     *
-     * @param command команда для добавления
-     */
-    private void addToHistory(String command) {
-        if (commandHistory.size() >= HISTORY_SIZE) {
-            commandHistory.remove(0);
-        }
-        commandHistory.push(command);
     }
 
     /**
