@@ -92,4 +92,8 @@ public class DragonCollection {
                 .filter(dragon -> dragon.getCharacter().compareTo(character) < 0)
                 .collect(Collectors.toList());
     }
+
+    public void save() {
+        fileManager.saveToFile(this);
+    }
 }

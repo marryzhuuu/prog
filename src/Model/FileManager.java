@@ -1,4 +1,6 @@
 package Model;
+import View.ConsoleView;
+
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,13 +10,22 @@ import java.util.*;
  * Класс FileManager отвечает за чтение и запись коллекции в файл.
  */
 public class FileManager {
+    private String filename;
+    private ConsoleView console;
+
+    public FileManager(ConsoleView console) {
+        this.console = console;
+        String filename = System.getenv("DRAGON_FILE");
+
+        if (filename == null || filename.isEmpty()) {
+            filename = "dragon_collection.json";
+        }
+
+        this.filename = filename;
+    }
+
     public DragonCollection loadFromFile() throws IOException, ParseException {
         try {
-            String filename = System.getenv("DRAGON_FILE");
-
-            if (filename == null || filename.isEmpty()) {
-                filename = "dragon_collection.json";
-            }
             // Читаем JSON из файла
             String json = readFile(filename);
 
@@ -30,7 +41,6 @@ public class FileManager {
     /**
      * Читает содержимое файла в строку.
      *
-     * @param filename Имя файла.
      * @return Содержимое файла в виде строки.
      * @throws IOException Если произошла ошибка при чтении файла.
      */
@@ -227,11 +237,10 @@ public class FileManager {
     /**
      * Сохраняет коллекцию драконов в файл в формате JSON.
      *
-     * @param filename   Имя файла, в который будут сохранены данные.
      * @param collection Коллекция драконов.
      * @throws IOException Если произошла ошибка при записи в файл.
      */
-    public void saveToFile(String filename, DragonCollection collection) throws IOException {
+    public void saveToFile(DragonCollection collection) {
         // Формируем JSON-строку вручную
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("["); // Начало JSON-массива
@@ -250,6 +259,8 @@ public class FileManager {
         // Записываем JSON в файл с помощью BufferedOutputStream
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(filename))) {
             outputStream.write(jsonBuilder.toString().getBytes()); // Преобразуем строку в байты и записываем
+        }  catch (IOException e) {
+            console.showError("Не удается открыть файл!");
         }
 
     }

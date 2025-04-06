@@ -85,7 +85,7 @@ public class DragonController {
                 consoleView.showMessage("Коллекция очищена");
                 break;
             case "save":
-                fileManager.saveToFile(filename, dragonCollection);
+                fileManager.saveToFile(dragonCollection);
                 break;
             case "execute_script":
                 try {

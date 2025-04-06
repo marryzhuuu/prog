@@ -2,9 +2,7 @@ import Controller.DragonController;
 import Model.DragonCollection;
 import Model.FileManager;
 import View.ConsoleView;
-import commands.CommandManager;
-import commands.Exit;
-import commands.Help;
+import commands.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -14,22 +12,21 @@ import java.text.ParseException;
  */
 public class Main {
     public static void main(String[] args) throws IOException, ParseException {
-        FileManager fileManager = new FileManager();
-        DragonCollection dragonCollection = new DragonCollection(fileManager);
         ConsoleView consoleView = new ConsoleView();
+        FileManager fileManager = new FileManager(consoleView);
+        DragonCollection dragonCollection = new DragonCollection(fileManager);
 
         var commandManager = new CommandManager() {{
             addCommand("exit", new Exit(consoleView));
             addCommand("help", new Help(consoleView, this));
-//            register("info", new Info(console, collectionManager));
-//            register("show", new Show(console, collectionManager));
+            addCommand("info", new Info(consoleView, dragonCollection));
+            addCommand("show", new Show(consoleView, dragonCollection));
 //            register("add", new Add(console, collectionManager));
 //            register("update", new Update(console, collectionManager));
 //            register("remove_by_id", new RemoveById(console, collectionManager));
-//            register("clear", new Clear(console, collectionManager));
-//            register("save", new Save(console, collectionManager));
+            addCommand("clear", new Clear(consoleView, dragonCollection));
+            addCommand("save", new Save(consoleView, dragonCollection));
 //            register("execute_script", new ExecuteScript(console));
-//            register("exit", new Exit(console));
 //            register("head", new Head(console, collectionManager));
 //            register("add_if_max", new AddIfMax(console, collectionManager));
 //            register("add_if_min", new AddIfMin(console, collectionManager));
