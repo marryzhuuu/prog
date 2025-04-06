@@ -1,5 +1,7 @@
 package Model;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -9,10 +11,19 @@ import java.util.stream.Collectors;
 public class DragonCollection {
     private Vector<Dragon> dragons;
     private Date date;
+    private FileManager fileManager;
 
     public DragonCollection() {
         dragons = new Vector<>();
         date = new Date();
+    }
+
+    public DragonCollection(FileManager fileManager) throws IOException, ParseException {
+        dragons = new Vector<>();
+        date = new Date();
+        this.fileManager = fileManager;
+
+        this.dragons = fileManager.loadFromFile().getDragons();
     }
 
     public Date getDate() {

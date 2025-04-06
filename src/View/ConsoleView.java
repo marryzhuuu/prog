@@ -27,6 +27,37 @@ public class ConsoleView {
     }
 
     /**
+     * Выводит obj.toString() в консоль
+     * @param obj Объект для печати
+     */
+    public void print(Object obj) {
+        System.out.print(obj);
+    }
+
+    /**
+     * Выводит obj.toString() + \n в консоль
+     * @param obj Объект для печати
+     */
+    public void println(Object obj) {
+        System.out.println(obj);
+    }
+
+    /**
+     * Выводит ошибка: obj.toString() в консоль
+     * @param obj Ошибка для печати
+     */
+    public void printError(Object obj) {
+        System.out.println("ошибка: " + obj);
+    }
+
+    public Scanner getScanner() { return this.scanner; }
+
+    public void commandPrompt() { System.out.print("$"); }
+
+    public void inputPrompt() { System.out.print(">"); }
+
+
+    /**
      * Выводит справку по доступным командам.
      */
     public void help() {

@@ -8,12 +8,23 @@ import java.util.*;
  * Класс FileManager отвечает за чтение и запись коллекции в файл.
  */
 public class FileManager {
-    public DragonCollection loadFromFile(String filename) throws IOException, ParseException {
-        // Читаем JSON из файла
-        String json = readFile(filename);
+    public DragonCollection loadFromFile() throws IOException, ParseException {
+        try {
+            String filename = System.getenv("DRAGON_FILE");
 
-        // Разбираем JSON вручную
-        return parseJson(json);
+            if (filename == null || filename.isEmpty()) {
+                filename = "dragon_collection.json";
+            }
+            // Читаем JSON из файла
+            String json = readFile(filename);
+
+            // Разбираем JSON вручную
+            return parseJson(json);
+
+        }
+        catch (Exception e) {
+            return new DragonCollection();
+        }
     }
 
     /**

@@ -3,6 +3,7 @@ package Controller;
 
 import Model.*;
 import View.ConsoleView;
+import commands.CommandManager;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,18 +11,26 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class DragonController {
+    public enum ExitCode {
+        OK,
+        ERROR,
+        EXIT,
+    }
     private DragonCollection dragonCollection;
     private ConsoleView consoleView;
     private FileManager fileManager;
     private String filename;
+    private CommandManager commandManager;
 
-    public DragonController(DragonCollection dragonCollection, ConsoleView consoleView, FileManager fileManager) {
+    public DragonController(DragonCollection dragonCollection, ConsoleView consoleView, FileManager fileManager, CommandManager commandManager) {
         this.dragonCollection = dragonCollection;
         this.consoleView = consoleView;
         this.fileManager = fileManager;
+        this.commandManager = commandManager;
     }
 
     public boolean executeCommand(String command) throws IOException {
@@ -81,7 +90,7 @@ public class DragonController {
             case "execute_script":
                 try {
                     String fileString = parts[1].split(" ")[0];
-                    if(!executeScript(fileString)){
+                    if(executeScript(fileString) == ExitCode.EXIT){
                         return false;
                     }
                 } catch (Exception e) {
@@ -144,21 +153,25 @@ public class DragonController {
 
 
     public void run() throws IOException, ParseException {
-        filename = System.getenv("DRAGON_FILE");
+        var scanner = consoleView.getScanner();
+        try {
+            ExitCode commandStatus;
+            String[] userCommand = {"", ""};
 
-        if (filename == null || filename.isEmpty()) {
-            filename = "dragon_collection.json";
+            do {
+                consoleView.commandPrompt();
+                userCommand = (scanner.nextLine().trim() + " ").split(" ", 2);
+                userCommand[1] = userCommand[1].trim();
+
+                commandManager.addToHistory(userCommand[0]);
+                commandStatus = executeCommand(userCommand);
+            } while (commandStatus != ExitCode.EXIT);
+
+        } catch (NoSuchElementException exception) {
+            consoleView.printError("Пользовательский ввод не обнаружен!");
+        } catch (IllegalStateException exception) {
+            consoleView.printError("Непредвиденная ошибка!");
         }
-
-        dragonCollection = fileManager.loadFromFile(filename);
-
-        while (true) {
-            String command = consoleView.readCommand();
-            boolean result = executeCommand(command);
-            if(!result) {
-                break;
-            };
-       }
     }
 
     /**
@@ -166,7 +179,7 @@ public class DragonController {
      *
      * @param filename Имя файла скрипта.
      */
-    public boolean executeScript(String filename) {
+    public ExitCode executeScript(String filename) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -179,13 +192,41 @@ public class DragonController {
                 boolean result = executeCommand(line);
                 consoleView.showMessage("\n");
                 if(!result) {
-                    return false;
+                    return ExitCode.ERROR;
                 }
             }
         } catch (IOException e) {
             consoleView.showMessage("Ошибка при чтении файла скрипта: " + e.getMessage());
         }
-        return true;
+        return ExitCode.EXIT;
+    }
+    /**
+     * Launchs the command.
+     * @param userCommand Команда для запуска
+     * @return Код завершения.
+     */
+    private ExitCode executeCommand(String[] userCommand) {
+        if (userCommand[0].equals("")) return ExitCode.OK;
+        var command = commandManager.getCommands().get(userCommand[0]);
+
+        if (command == null) {
+            consoleView.printError("Команда '" + userCommand[0] + "' не найдена. Наберите 'help' для справки");
+            return ExitCode.ERROR;
+        }
+
+        switch (userCommand[0]) {
+            case "exit" -> {
+                if (!commandManager.getCommands().get("exit").apply(userCommand)) return ExitCode.ERROR;
+                else return ExitCode.EXIT;
+            }
+            case "execute_script" -> {
+                if (!commandManager.getCommands().get("execute_script").apply(userCommand)) return ExitCode.ERROR;
+                else return executeScript(userCommand[1]);
+            }
+            default -> { if (!command.apply(userCommand)) return ExitCode.ERROR; }
+        };
+
+        return ExitCode.OK;
     }
 
 }
