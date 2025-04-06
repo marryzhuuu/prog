@@ -1,6 +1,6 @@
 package commands;
 
-import View.ConsoleView;
+import view.ConsoleView;
 
 /**
  * Команда 'exit'. Завершает выполнение программы.

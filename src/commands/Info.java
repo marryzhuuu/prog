@@ -1,7 +1,7 @@
 package commands;
 
-import Model.DragonCollection;
-import View.ConsoleView;
+import model.DragonCollection;
+import view.ConsoleView;
 
 /**
  * Команда 'info'. Выводит информацию о коллекции.

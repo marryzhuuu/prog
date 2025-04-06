@@ -1,10 +1,8 @@
-package View;
+package view;
 
-import Model.*;
+import model.*;
 
-import java.util.*;
-
-import Model.Dragon;
+import model.Dragon;
 
 import java.util.List;
 import java.util.Scanner;

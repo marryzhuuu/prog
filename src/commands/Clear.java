@@ -1,8 +1,8 @@
 package commands;
 
 
-import Model.DragonCollection;
-import View.ConsoleView;
+import model.DragonCollection;
+import view.ConsoleView;
 
 /**
  * Команда 'clear'. Очищает коллекцию.

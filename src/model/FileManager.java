@@ -1,5 +1,5 @@
-package Model;
-import View.ConsoleView;
+package model;
+import view.ConsoleView;
 
 import java.io.*;
 import java.text.ParseException;

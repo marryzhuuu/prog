@@ -1,8 +1,8 @@
-package Controller;
+package controller;
 
 
-import Model.*;
-import View.ConsoleView;
+import model.*;
+import view.ConsoleView;
 import commands.CommandManager;
 import exceptions.ScriptRecursionException;
 

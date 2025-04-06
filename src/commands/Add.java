@@ -1,7 +1,8 @@
 package commands;
 
-import Model.DragonCollection;
-import View.ConsoleView;
+import model.DragonCollection;
+import view.ConsoleView;
+import model.builders.DragonBuilder;
 
 /**
  * Команда 'add'. Добавляет новый элемент в коллекцию.
@@ -24,8 +25,8 @@ public class Add extends Command {
     public boolean apply(String[] arguments) {
         try {
             console.println("* Создание нового дракона:");
-            console.attributePrompt();
-            collection.addDragon(console.readDragon());
+//            collection.addDragon(console.readDragon());
+            collection.addDragon(new DragonBuilder(console).build());
             console.println("Дракон успешно добавлен!");
             return true;
 

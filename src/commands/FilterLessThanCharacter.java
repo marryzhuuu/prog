@@ -1,9 +1,9 @@
 package commands;
 
-import Model.Dragon;
-import Model.DragonCharacter;
-import Model.DragonCollection;
-import View.ConsoleView;
+import model.Dragon;
+import model.DragonCharacter;
+import model.DragonCollection;
+import view.ConsoleView;
 import exceptions.WrongArgumentsAmount;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package commands;
 
-import Model.Color;
-import Model.DragonCollection;
-import View.ConsoleView;
+import model.Color;
+import model.DragonCollection;
+import view.ConsoleView;
 
 import java.util.Map;
 

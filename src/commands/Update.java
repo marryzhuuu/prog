@@ -1,8 +1,8 @@
 package commands;
 
-import Model.Dragon;
-import Model.DragonCollection;
-import View.ConsoleView;
+import model.Dragon;
+import model.DragonCollection;
+import view.ConsoleView;
 import exceptions.NotFoundException;
 import exceptions.WrongArgumentsAmount;
 

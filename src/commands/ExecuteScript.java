@@ -1,8 +1,6 @@
 package commands;
 
-import Model.DragonCollection;
-import View.ConsoleView;
-import exceptions.WrongArgumentsAmount;
+import view.ConsoleView;
 
 /**
  * Команда 'execute_script'. Выполняет скрипт из файла.

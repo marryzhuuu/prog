@@ -1,7 +1,7 @@
-import Controller.DragonController;
-import Model.DragonCollection;
-import Model.FileManager;
-import View.ConsoleView;
+import controller.DragonController;
+import model.DragonCollection;
+import model.FileManager;
+import view.ConsoleView;
 import commands.*;
 
 import java.io.IOException;

@@ -1,9 +1,7 @@
 package commands;
 
-import Model.DragonCollection;
-import View.ConsoleView;
-
-import java.io.IOException;
+import model.DragonCollection;
+import view.ConsoleView;
 
 /**
  * Команда 'save'. Сохраняет коллекцию в файл.

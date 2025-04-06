@@ -1,6 +1,6 @@
 package commands;
 
-import View.ConsoleView;
+import view.ConsoleView;
 
 /**
  * Команда 'history'. Выводит последние 15 команд
