@@ -28,7 +28,7 @@ public class RemoveGreater extends Command {
             Dragon greaterDragon = console.readDragon();
             int initialSize = collection.size();
             int newSize = collection.removeGreater(greaterDragon);
-            console.showMessage("Удалено " + (initialSize-newSize) + " элементов");
+            console.println("Удалено " + (initialSize-newSize) + " элементов");
             return true;
 
         } catch (Exception e) {

@@ -28,10 +28,10 @@ public class AddIfMax extends Command {
             Dragon newDragon = console.readDragon();
             Dragon addedDragon = collection.addIfMax(newDragon);
             if(addedDragon != null) {
-                console.showMessage("Добавлен элемент:\n" + addedDragon);
+                console.println("Добавлен элемент:\n" + addedDragon);
             }
             else {
-                console.showMessage("В коллекции есть драконы не младше");
+                console.println("В коллекции есть драконы не младше");
             }
             return true;
 

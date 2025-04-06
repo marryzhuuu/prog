@@ -35,7 +35,7 @@ public class Update extends Command {
             }
             Dragon updatedDragon = console.readDragonParams(dragon);
             dragon = collection.updateDragon(id, updatedDragon);
-            console.showMessage("\nОбновленный дракон:\n" + dragon);
+            console.println("\nОбновленный дракон:\n" + dragon);
             return true;
         }
         catch (WrongArgumentsAmount e) {

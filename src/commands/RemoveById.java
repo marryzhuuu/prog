@@ -33,7 +33,7 @@ public class RemoveById extends Command {
                 throw new NotFoundException();
             }
             collection.removeDragon(id);
-            console.showMessage("Дракон успешно удален!");
+            console.println("Дракон успешно удален!");
             return true;
         }
         catch (WrongArgumentsAmount e) {

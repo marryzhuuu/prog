@@ -24,6 +24,7 @@ public class Add extends Command {
     public boolean apply(String[] arguments) {
         try {
             console.println("* Создание нового дракона:");
+            console.attributePrompt();
             collection.addDragon(console.readDragon());
             console.println("Дракон успешно добавлен!");
             return true;
