@@ -2,6 +2,7 @@ package commands;
 
 import model.Dragon;
 import model.DragonCollection;
+import model.builders.DragonBuilder;
 import view.ConsoleView;
 
 /**
@@ -25,7 +26,7 @@ public class AddIfMax extends Command {
     public boolean apply(String[] arguments) {
         try {
             console.println("* Добавление нового дракона:");
-            Dragon newDragon = console.readDragon();
+            Dragon newDragon = new DragonBuilder(console).build();
             Dragon addedDragon = collection.addIfMax(newDragon);
             if(addedDragon != null) {
                 console.println("Добавлен элемент:\n" + addedDragon);

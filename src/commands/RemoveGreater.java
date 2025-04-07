@@ -2,6 +2,7 @@ package commands;
 
 import model.Dragon;
 import model.DragonCollection;
+import model.builders.DragonBuilder;
 import view.ConsoleView;
 
 /**
@@ -25,7 +26,7 @@ public class RemoveGreater extends Command {
     public boolean apply(String[] arguments) {
         try {
             console.println("* Ввод данных дракона:");
-            Dragon greaterDragon = console.readDragon();
+            Dragon greaterDragon = new DragonBuilder(console).build();
             int initialSize = collection.size();
             int newSize = collection.removeGreater(greaterDragon);
             console.println("Удалено " + (initialSize-newSize) + " элементов");
