@@ -2,6 +2,7 @@ package commands;
 
 import model.Dragon;
 import model.DragonCollection;
+import model.builders.DragonBuilder;
 import view.ConsoleView;
 import exceptions.NotFoundException;
 import exceptions.WrongArgumentsAmount;
@@ -33,7 +34,7 @@ public class Update extends Command {
             if (dragon == null) {
                 throw new NotFoundException();
             }
-            Dragon updatedDragon = console.readDragonParams(dragon);
+            Dragon updatedDragon = new DragonBuilder(console).update(dragon);
             dragon = collection.updateDragon(id, updatedDragon);
             console.println("\nОбновленный дракон:\n" + dragon);
             return true;

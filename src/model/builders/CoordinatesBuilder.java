@@ -5,20 +5,41 @@ import view.ConsoleView;
 
 public class CoordinatesBuilder extends Builder<Coordinates> {
     private final ConsoleView console;
-    private final Coordinates current;
 
     public CoordinatesBuilder(ConsoleView console) {
         this.console = console;
-        this.current = null;
-    }
-
-    public CoordinatesBuilder(ConsoleView console, Coordinates current) {
-        this.console = console;
-        this.current = current;
     }
 
     @Override
     public Coordinates build() {
+        double x = 0, y = 0;
+        while (true) {
+            console.println("Координата X: ");
+            console.attributePrompt();
+            try {
+                String coordString = console.getScanner().nextLine().trim();
+                x = Double.parseDouble(coordString);
+                break;
+            } catch (NumberFormatException e) {
+                console.printError("Введите корректное число.");
+            }
+        }
+        while (true) {
+            console.println("Координата Y: ");
+            console.attributePrompt();
+            try {
+                String coordString = console.getScanner().nextLine().trim();
+                y = Double.parseDouble(coordString);
+                break;
+            } catch (NumberFormatException e) {
+                console.printError("Введите корректное число.");
+            }
+        }
+        return new Coordinates(x, y);
+    }
+
+
+    public Coordinates update(Coordinates current) {
         double x = 0, y = 0;
         while (true) {
             console.println("Координата X: ");
@@ -38,7 +59,7 @@ public class CoordinatesBuilder extends Builder<Coordinates> {
             }
         }
         while (true) {
-            System.out.print("Координата Y: ");
+            console.println("Координата Y: ");
             console.attributePrompt();
             try {
                 String coordString = console.getScanner().nextLine().trim();

@@ -9,19 +9,30 @@ public class DragonBuilder extends Builder<Dragon> {
     public DragonBuilder(ConsoleView console) {
         this.console = console;
     }
+
     @Override
     public Dragon build() {
-        var dragon = new Dragon(
+        return new Dragon(
             getName(),
             getCoordinates(),
             getAge(),
-            getDesctiption(),
+            getDescription(),
             getColor(),
             getCharacter(),
             getCave()
         );
+    }
 
-        return dragon;
+    public Dragon update(Dragon dragon) {
+        return new Dragon(
+            getName(dragon),
+            getCoordinates(dragon.getCoordinates()),
+            getAge(dragon),
+            getDescription(dragon),
+            getColor(dragon),
+            getCharacter(dragon),
+            getCave(dragon.getCave())
+        );
     }
 
     /**
@@ -42,11 +53,32 @@ public class DragonBuilder extends Builder<Dragon> {
         return name;
     }
 
+    String getName(Dragon dragon) {
+        String name;
+        String currentName = dragon.getName();
+        console.println("Текущее имя: " + currentName);
+        console.attributePrompt();
+        name = console.getScanner().nextLine().trim();
+        if (name.isEmpty()) {
+            name = currentName;
+        }
+        console.println("Новое имя: " + name);
+        return name;
+    }
+
+
     /**
      * Ввод имени (не может быть null)
      */
     Coordinates getCoordinates() {
         return new CoordinatesBuilder(console).build();
+    }
+
+    Coordinates getCoordinates(Coordinates coordinates) {
+        console.println("Текущие координаты: " + coordinates);
+        Coordinates newCoordinates =  new CoordinatesBuilder(console).update(coordinates);
+        console.println("Новые координаты: " + newCoordinates);
+        return newCoordinates;
     }
 
     /**
@@ -70,10 +102,36 @@ public class DragonBuilder extends Builder<Dragon> {
         return age;
     }
 
+    int getAge(Dragon dragon) {
+        int currentAge = dragon.getAge();
+        int age=currentAge;
+        console.println("Текущий возраст: " + currentAge);
+        console.attributePrompt();
+        while(true) {
+            try {
+                String ageString = console.getScanner().nextLine().trim();
+                if (ageString.isEmpty()) {
+                    break;
+                }
+                age = Integer.parseInt(ageString);
+                if (age > 0) {
+                    break;
+                }
+                console.printError("Возраст должен быть больше 0.");
+                break;
+            } catch (NumberFormatException e) {
+                console.printError("Возраст (должен быть больше 0): ");
+            }
+
+        }
+        console.println("Новый возраст: " + age);
+        return age;
+    }
+
     /**
      * Ввод описания (не может быть null)
      */
-    String getDesctiption() {
+    String getDescription() {
         String description;
         while (true) {
             console.println("Описание (не может быть пустым): ");
@@ -84,6 +142,19 @@ public class DragonBuilder extends Builder<Dragon> {
             }
             console.printError("Описание не может быть пустым.");
         }
+        return description;
+    }
+
+    String getDescription(Dragon dragon) {
+        String currentDescription = dragon.getDescription();
+        String description;
+        console.println("Текущее описание: " + currentDescription);
+        console.attributePrompt();
+        description = console.getScanner().nextLine().trim();
+        if (description.isEmpty()) {
+            description=currentDescription;
+        }
+        console.println("Новое описание: " + description);
         return description;
     }
 
@@ -105,6 +176,29 @@ public class DragonBuilder extends Builder<Dragon> {
         return color;
     }
 
+    Color getColor(Dragon dragon) {
+        Color color;
+        Color currentColor=dragon.getColor();
+        console.println("Текущий цвет: " + dragon.getColor());
+        while (true) {
+            console.println("Цвет (RED, ORANGE, WHITE, BROWN): ");
+            console.attributePrompt();
+            try {
+                String colorString = console.getScanner().nextLine().trim();
+                if (colorString.isEmpty()) {
+                    color = currentColor;
+                    break;
+                }
+                color = Color.valueOf(colorString.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                console.printError("Введите корректный цвет.");
+            }
+        }
+        console.println("Новый цвет: " + color);
+        return color;
+    }
+
     /**
      * Ввод характера (не может быть null, должен быть одним из значений enum DragonCharacter)
      */
@@ -123,10 +217,39 @@ public class DragonBuilder extends Builder<Dragon> {
         return character;
     }
 
+    DragonCharacter getCharacter(Dragon dragon) {
+        DragonCharacter character;
+        DragonCharacter currentCharacter=dragon.getCharacter();
+        console.println("Текущий характер: " + currentCharacter);
+        while (true) {
+            console.println("Характер (CUNNING, EVIL, GOOD, CHAOTIC_EVIL, FICKLE): ");
+            console.attributePrompt();
+            try {
+                String characterString = console.getScanner().nextLine().trim();
+                if (characterString.isEmpty()) {
+                    character = currentCharacter;
+                    break;
+                }
+                character = DragonCharacter.valueOf(characterString.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                console.printError("Введите корректный характер.");
+            }
+        }
+        console.println("Новый характер: " + character);
+        return character;
+    }
+
     /**
      * Ввод пещеры (не может быть null)
      */
     DragonCave getCave() {
         return new CaveBuilder(console).build();
+    }
+    DragonCave getCave(DragonCave cave) {
+        console.println("Текущая пещера: " + cave);
+        DragonCave newCave = new CaveBuilder(console).update(cave);
+        console.println("Новая пещера: " + newCave);
+        return newCave;
     }
 };
