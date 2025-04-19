@@ -90,6 +90,7 @@ public class Dragon {
     public String toString() {
         return String.format(
                 """
+                 
                  id: %d,
                  name: %s,
                  coordinates: %s,
@@ -98,8 +99,7 @@ public class Dragon {
                  description: %s,
                  color: %s,
                  character: %s,
-                 cave: %s
-                 """,
+                 cave: %s""",
                 id,
                 name, // Экранируем строки
                 coordinates,

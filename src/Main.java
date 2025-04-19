@@ -13,8 +13,7 @@ import java.text.ParseException;
 public class Main {
     public static void main(String[] args) throws IOException, ParseException {
         ConsoleView consoleView = new ConsoleView();
-        FileManager fileManager = new FileManager(consoleView);
-        DragonCollection dragonCollection = new DragonCollection(fileManager);
+        DragonCollection dragonCollection = new DragonCollection(new FileManager());
 
         var commandManager = new CommandManager() {{
             addCommand("exit", new Exit(consoleView));
@@ -35,7 +34,8 @@ public class Main {
             addCommand("execute_script", new ExecuteScript(consoleView));
         }};
 
-        DragonController controller = new DragonController(dragonCollection, consoleView, fileManager, commandManager);
-        controller.run();
+        DragonController controller = new DragonController(consoleView, commandManager);
+
+        consoleView.run(controller);
     }
 }

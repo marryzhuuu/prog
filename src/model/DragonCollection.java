@@ -1,5 +1,7 @@
 package model;
 
+import exceptions.SaveToFileException;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
@@ -10,7 +12,7 @@ import java.util.stream.Collectors;
  */
 public class DragonCollection {
     private Vector<Dragon> dragons;
-    private Date date;
+    private final Date date;
     private FileManager fileManager;
 
     public DragonCollection() {
@@ -44,8 +46,7 @@ public class DragonCollection {
     }
 
     public Dragon findDragonById(int id) {
-        Dragon dragon = dragons.stream().filter(d -> d.getId() == id).findFirst().orElse(null);
-        return dragon;
+        return dragons.stream().filter(d -> d.getId() == id).findFirst().orElse(null);
     }
 
     public Vector<Dragon> getDragons() {
@@ -76,9 +77,8 @@ public class DragonCollection {
     }
 
     public Map<Color, Long> groupCountingByColor() {
-        Map<Color, Long> dragonsByColor = dragons.stream()
+        return dragons.stream()
                 .collect(Collectors.groupingBy(Dragon::getColor, Collectors.counting()));
-        return dragonsByColor;
     }
 
     public long countGreaterThanAge(long minAge) {
@@ -93,7 +93,7 @@ public class DragonCollection {
                 .collect(Collectors.toList());
     }
 
-    public void save() {
+    public void save() throws SaveToFileException {
         fileManager.saveToFile(this);
     }
 }

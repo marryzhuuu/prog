@@ -1,5 +1,5 @@
 package model;
-import view.ConsoleView;
+import exceptions.SaveToFileException;
 
 import java.io.*;
 import java.text.ParseException;
@@ -10,11 +10,9 @@ import java.util.*;
  * Класс FileManager отвечает за чтение и запись коллекции в файл.
  */
 public class FileManager {
-    private String filename;
-    private ConsoleView console;
+    private final String filename;
 
-    public FileManager(ConsoleView console) {
-        this.console = console;
+    public FileManager() {
         String filename = System.getenv("DRAGON_FILE");
 
         if (filename == null || filename.isEmpty()) {
@@ -62,7 +60,7 @@ public class FileManager {
      * @return Коллекция объектов Dragon.
      * @throws ParseException Если произошла ошибка при разборе JSON.
      */
-    private DragonCollection parseJson(String json) throws ParseException {
+    private DragonCollection parseJson(String json) throws ParseException, IOException {
         DragonCollection dragons = new DragonCollection();
         json = json.trim();
 
@@ -238,9 +236,8 @@ public class FileManager {
      * Сохраняет коллекцию драконов в файл в формате JSON.
      *
      * @param collection Коллекция драконов.
-     * @throws IOException Если произошла ошибка при записи в файл.
      */
-    public void saveToFile(DragonCollection collection) {
+    public void saveToFile(DragonCollection collection) throws SaveToFileException {
         // Формируем JSON-строку вручную
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("["); // Начало JSON-массива
@@ -260,7 +257,7 @@ public class FileManager {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(filename))) {
             outputStream.write(jsonBuilder.toString().getBytes()); // Преобразуем строку в байты и записываем
         }  catch (IOException e) {
-            console.showError("Не удается открыть файл!");
+            throw new SaveToFileException();
         }
 
     }

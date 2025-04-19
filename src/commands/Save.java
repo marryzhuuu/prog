@@ -1,5 +1,6 @@
 package commands;
 
+import exceptions.SaveToFileException;
 import model.DragonCollection;
 import view.ConsoleView;
 
@@ -27,7 +28,12 @@ public class Save extends Command {
             return false;
         }
 
-        collection.save();
+        try {
+            collection.save();
+        }
+        catch (SaveToFileException e) {
+            console.printError("Ошибка сохранения в файл!");
+        }
         console.println("Коллекция сохранена");
         return true;
     }
