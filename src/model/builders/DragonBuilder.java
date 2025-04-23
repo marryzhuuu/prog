@@ -46,6 +46,9 @@ public class DragonBuilder extends Builder<Dragon> {
             console.attributePrompt();
             name = console.getScanner().nextLine().trim();
             if (!name.isEmpty()) {
+                if (console.isScriptMode()) {
+                    console.println(name);
+                }
                 break;
             }
             console.printError("Имя не может быть пустым.");
@@ -60,6 +63,9 @@ public class DragonBuilder extends Builder<Dragon> {
         console.attributePrompt();
         name = console.getScanner().nextLine().trim();
         if (name.isEmpty()) {
+            if (console.isScriptMode()) {
+                console.println(name);
+            }
             name = currentName;
         }
         console.println("Новое имя: " + name);
@@ -92,6 +98,9 @@ public class DragonBuilder extends Builder<Dragon> {
             try {
                 age = Integer.parseInt(console.getScanner().nextLine());
                 if (age > 0) {
+                    if (console.isScriptMode()) {
+                        console.println(age);
+                    }
                     break;
                 }
                 console.printError("Возраст должен быть больше 0.");
@@ -115,6 +124,9 @@ public class DragonBuilder extends Builder<Dragon> {
                 }
                 age = Integer.parseInt(ageString);
                 if (age > 0) {
+                    if (console.isScriptMode()) {
+                        console.println(age);
+                    }
                     break;
                 }
                 console.printError("Возраст должен быть больше 0.");
@@ -138,6 +150,9 @@ public class DragonBuilder extends Builder<Dragon> {
             console.attributePrompt();
             description = console.getScanner().nextLine().trim();
             if (!description.isEmpty()) {
+                if (console.isScriptMode()) {
+                    console.println(description);
+                }
                 break;
             }
             console.printError("Описание не может быть пустым.");
@@ -154,6 +169,9 @@ public class DragonBuilder extends Builder<Dragon> {
         if (description.isEmpty()) {
             description=currentDescription;
         }
+        if (console.isScriptMode()) {
+            console.println(description);
+        }
         console.println("Новое описание: " + description);
         return description;
     }
@@ -168,6 +186,9 @@ public class DragonBuilder extends Builder<Dragon> {
             console.attributePrompt();
             try {
                 color = Color.valueOf(console.getScanner().nextLine().toUpperCase());
+                if (console.isScriptMode()) {
+                    console.println(color);
+                }
                 break;
             } catch (IllegalArgumentException e) {
                 console.printError("Введите корректный цвет.");
@@ -187,9 +208,15 @@ public class DragonBuilder extends Builder<Dragon> {
                 String colorString = console.getScanner().nextLine().trim();
                 if (colorString.isEmpty()) {
                     color = currentColor;
+                    if (console.isScriptMode()) {
+                        console.println(color);
+                    }
                     break;
                 }
                 color = Color.valueOf(colorString.toUpperCase());
+                if (console.isScriptMode()) {
+                    console.println(color);
+                }
                 break;
             } catch (IllegalArgumentException e) {
                 console.printError("Введите корректный цвет.");
@@ -209,6 +236,9 @@ public class DragonBuilder extends Builder<Dragon> {
             console.attributePrompt();
             try {
                 character = DragonCharacter.valueOf(console.getScanner().nextLine().toUpperCase());
+                if (console.isScriptMode()) {
+                    console.println(character);
+                }
                 break;
             } catch (IllegalArgumentException e) {
                 console.printError("Ошибка: Введите корректный характер.");
@@ -228,9 +258,15 @@ public class DragonBuilder extends Builder<Dragon> {
                 String characterString = console.getScanner().nextLine().trim();
                 if (characterString.isEmpty()) {
                     character = currentCharacter;
+                    if (console.isScriptMode()) {
+                        console.println(character);
+                    }
                     break;
                 }
                 character = DragonCharacter.valueOf(characterString.toUpperCase());
+                if (console.isScriptMode()) {
+                    console.println(character);
+                }
                 break;
             } catch (IllegalArgumentException e) {
                 console.printError("Введите корректный характер.");

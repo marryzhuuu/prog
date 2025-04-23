@@ -61,22 +61,31 @@ public class DragonController {
     private ExitCode executeScript(String filename) {
 
         String[] userCommand;
-        ExitCode commandStatus;
+        ExitCode commandStatus = null;
         scriptStack.add(filename);
         if (!new File(filename).exists()) {
             filename = "../" + filename;
         }
         try (Scanner scriptScanner = new Scanner(new File(filename))) {
+            Scanner prevScanner = consoleView.selectScanner(scriptScanner, true);
             if (!scriptScanner.hasNext()) throw new NoSuchElementException();
             do {
-                userCommand = consoleView.getCommand(scriptScanner);
+                userCommand = consoleView.getCommand();
+                boolean recursiveScript = false;
                 if (userCommand[0].equals("execute_script")) {
                     for (String script : scriptStack) {
-                        if (userCommand[1].equals(script)) throw new ScriptRecursionException();
+                        if (userCommand[1].equals(script)) {
+                            consoleView.printError("Скрипты не могут вызываться рекурсивно!");
+                            recursiveScript = true;
+                            break;
+                        }
                     }
                 }
+                if (recursiveScript) continue;
                 commandStatus = executeCommand(userCommand);
             } while (commandStatus == ExitCode.OK && scriptScanner.hasNextLine());
+
+            consoleView.selectScanner(prevScanner, false);
 
             if (commandStatus == ExitCode.ERROR && !(userCommand[0].equals("execute_script") && !userCommand[1].isEmpty())) {
                 consoleView.println("Проверьте скрипт на корректность введенных данных!");
@@ -88,8 +97,6 @@ public class DragonController {
             consoleView.printError("Файл со скриптом не найден!");
         } catch (NoSuchElementException exception) {
             consoleView.printError("Файл со скриптом пуст!");
-        } catch (ScriptRecursionException exception) {
-            consoleView.printError("Скрипты не могут вызываться рекурсивно!");
         } catch (IllegalStateException exception) {
             consoleView.printError("Непредвиденная ошибка!");
             System.exit(0);

@@ -19,6 +19,9 @@ public class CoordinatesBuilder extends Builder<Coordinates> {
             try {
                 String coordString = console.getScanner().nextLine().trim();
                 x = Double.parseDouble(coordString);
+                if (console.isScriptMode()) {
+                    console.println(x);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите корректное число.");
@@ -30,6 +33,9 @@ public class CoordinatesBuilder extends Builder<Coordinates> {
             try {
                 String coordString = console.getScanner().nextLine().trim();
                 y = Double.parseDouble(coordString);
+                if (console.isScriptMode()) {
+                    console.println(y);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите корректное число.");
@@ -50,9 +56,15 @@ public class CoordinatesBuilder extends Builder<Coordinates> {
                     if(current != null) {
                         x = current.getX();
                     }
+                    if (console.isScriptMode()) {
+                        console.println(x);
+                    }
                     break;
                 }
                 x = Double.parseDouble(coordString);
+                if (console.isScriptMode()) {
+                    console.println(x);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите корректное число.");
@@ -67,9 +79,15 @@ public class CoordinatesBuilder extends Builder<Coordinates> {
                     if(current != null) {
                         y = current.getY();
                     }
+                    if (console.isScriptMode()) {
+                        console.println(y);
+                    }
                     break;
                 }
                 y = Double.parseDouble(coordString);
+                if (console.isScriptMode()) {
+                    console.println(y);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите корректное число.");

@@ -21,6 +21,9 @@ public class CaveBuilder extends Builder<DragonCave> {
             try {
                 String depthString = console.getScanner().nextLine().trim();
                 depth = Integer.parseInt(depthString);
+                if (console.isScriptMode()) {
+                    console.println(depth);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите целое число.");
@@ -34,6 +37,9 @@ public class CaveBuilder extends Builder<DragonCave> {
             try {
                 String treasuresString = console.getScanner().nextLine().trim();
                 treasures = Long.parseLong(treasuresString);
+                if (console.isScriptMode()) {
+                    console.println(treasures);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите целое число.");
@@ -55,9 +61,15 @@ public class CaveBuilder extends Builder<DragonCave> {
                     if(current != null) {
                         depth = current.getDepth();
                     }
+                    if (console.isScriptMode()) {
+                        console.println(depth);
+                    }
                     break;
                 }
                 depth = Integer.parseInt(depthString);
+                if (console.isScriptMode()) {
+                    console.println(depth);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите целое число.");
@@ -74,9 +86,15 @@ public class CaveBuilder extends Builder<DragonCave> {
                     if(current != null) {
                         treasures = current.getTreasures();
                     }
+                    if (console.isScriptMode()) {
+                        console.println(treasures);
+                    }
                     break;
                 }
                 treasures = Long.parseLong(treasuresString);
+                if (console.isScriptMode()) {
+                    console.println(treasures);
+                }
                 break;
             } catch (NumberFormatException e) {
                 console.printError("Введите целое число.");

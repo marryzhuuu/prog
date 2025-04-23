@@ -14,10 +14,12 @@ import java.util.*;
 public class ConsoleView {
     private static final String commandPrompt = "$ ";
     private static final String attributePrompt = "> ";
-    private final Scanner scanner;
+    private Scanner scanner;
+    private boolean scriptMode;
 
     public ConsoleView() {
         scanner = new Scanner(System.in);
+        scriptMode = false;
     }
 
     /**
@@ -45,9 +47,26 @@ public class ConsoleView {
     }
 
     /**
+     * Переключает script mode, заменяет текущий сканер, возвращает предыдущий сканер
+     */
+    public Scanner selectScanner(Scanner scanner, boolean scriptMode) {
+        Scanner currentScanner = this.scanner;
+        this.scriptMode = scriptMode;
+        this.scanner = scanner;
+        return currentScanner;
+    }
+
+    /**
+     * Возвращает scriptMode
+     */
+    public boolean isScriptMode() {
+        return scriptMode;
+    }
+
+    /**
      * Читает команду из сканера
      */
-    public String[] getCommand(Scanner scanner) {
+    public String[] getCommand() {
         String[] command = (scanner.nextLine().trim() + " ").split(" ", 2);
         command[1] = command[1].trim();
         while (scanner.hasNextLine() && command[0].isEmpty()) {
