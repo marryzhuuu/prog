@@ -1,11 +1,14 @@
-package client.commands;
+package server.commands;
+
+import share.network.requests.Request;
+import share.network.responses.Response;
 
 import java.util.Objects;
 
 /**
  * Абстрактный класс команд.
  */
-public abstract class Command {
+public abstract class Command implements Executable{
     private String name;
     private String description;
 
@@ -48,12 +51,4 @@ public abstract class Command {
                 ", description='" + description + '\'' +
                 '}';
     }
-
-    /**
-     * Выполнить команду.
-     *
-     * @param arguments Аргумент для выполнения
-     * @return результат выполнения
-     */
-    public boolean apply(String[] arguments) { return true;}
 }

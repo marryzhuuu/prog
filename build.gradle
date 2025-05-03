@@ -20,6 +20,7 @@ subprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
         implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
         implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+        implementation 'org.apache.commons:commons-lang3:3.12.0'
     }
 
     test {
@@ -46,12 +47,9 @@ project(':client') {
 project(':server') {
     dependencies {
         implementation project(':share')
+        implementation 'com.google.guava:guava:31.1-jre'
     }
     application {
         mainClass = 'server.Main' // Замените на ваш главный класс
     }
 }
-
-//project(':share') {
-//    // Конфигурация для модуля share (если необходимо)
-//}

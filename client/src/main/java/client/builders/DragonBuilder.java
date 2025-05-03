@@ -1,6 +1,5 @@
 package client.builders;
 
-import client.model.*;
 import client.view.ConsoleView;
 
 public class DragonBuilder extends Builder<Dragon> {

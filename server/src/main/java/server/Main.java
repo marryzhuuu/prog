@@ -2,6 +2,17 @@ package server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import server.commands.CommandManager;
+import server.commands.*;
+import server.model.DragonCollection;
+import server.model.FileManager;
+import server.network.UDPDatagramServer;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.text.ParseException;
 
 
 /**
@@ -12,14 +23,25 @@ public class Main {
 
     public static Logger logger = LogManager.getLogger("ServerLogger");
 
-    public static void main(String[] args) {
-        if (args.length == 0) {
-            System.out.println("Введите имя загружаемого файла как аргумент командной строки");
-            System.exit(1);
-        }
+    public static void main(String[] args) throws IOException, ParseException {
 
-        System.out.println("Arguments: " + args[0]);
-        logger.debug("Arguments: " + args[0]);
+        DragonCollection dragonCollection = new DragonCollection(new FileManager());
+
+
+        var commandManager = new CommandManager() {{
+            addCommand("help", new Help(this));
+            // ToDo: остальные команды
+        }};
+
+        try {
+            var server = new UDPDatagramServer(InetAddress.getLocalHost(), PORT, new CommandHandler(commandManager));
+            // ToDo: сохранение коллекции перед завершением работы ссервера
+            server.run();
+        } catch (SocketException e) {
+            logger.fatal("Ошибка сокета", e);
+        } catch (UnknownHostException e) {
+            logger.fatal("Неизвестный хост", e);
+        }
 
     }
 }

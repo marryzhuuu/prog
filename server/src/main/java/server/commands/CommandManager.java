@@ -1,4 +1,4 @@
-package client.commands;
+package server.commands;
 
 import java.util.ArrayList;
 import java.util.HashMap;
