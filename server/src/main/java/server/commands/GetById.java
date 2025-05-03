@@ -2,18 +2,19 @@ package server.commands;
 
 import server.collection.DragonCollection;
 import share.commands.CommandType;
+import share.network.requests.GetByIdRequest;
 import share.network.requests.Request;
+import share.network.responses.GetByIdResponse;
 import share.network.responses.Response;
-import share.network.responses.ShowResponse;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'get'. Служебная команда. Получает элемент коллекции по id.
  */
-public class Show extends Command {
+public class GetById extends Command {
     private final DragonCollection collection;
 
-    public Show(DragonCollection collection) {
-        super(CommandType.SHOW);
+    public GetById(DragonCollection collection) {
+        super(CommandType.GET + "get");
         this.collection = collection;
     }
 
@@ -24,9 +25,10 @@ public class Show extends Command {
     @Override
     public Response apply(Request request) {
         try {
-            return new ShowResponse(collection.getDragons(), null);
+            var req = (GetByIdRequest) request;
+            return new GetByIdResponse(collection.findDragonById(req.id), null);
         } catch (Exception e) {
-            return new ShowResponse(null, e.toString());
+            return new GetByIdResponse(null, e.toString());
         }
   }
 }

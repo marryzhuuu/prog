@@ -3,20 +3,20 @@ package client.commands;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
-import share.network.requests.InfoRequest;
-import share.network.responses.InfoResponse;
+import share.network.requests.HistoryRequest;
+import share.network.responses.HistoryResponse;
 
 import java.io.IOException;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'history'. Выводит последние 15 команд, полученных сервером.
  */
-public class Info extends Command {
+public class History extends Command {
     private final ConsoleView console;
     private final UDPClient client;
 
-    public Info(ConsoleView console, UDPClient client) {
-        super(CommandType.INFO, "вывести информацию о коллекции");
+    public History(ConsoleView console, UDPClient client) {
+        super(CommandType.HISTORY, "вывести последние 15 команд");
         this.console = console;
         this.client = client;
     }
@@ -34,8 +34,8 @@ public class Info extends Command {
         }
 
         try {
-            var response = (InfoResponse) client.sendAndReceiveCommand(new InfoRequest());
-            console.println(response.infoMessage);
+            var response = (HistoryResponse) client.sendAndReceiveCommand(new HistoryRequest());
+            console.println(response.historyMessage);
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");

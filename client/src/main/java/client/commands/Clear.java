@@ -3,20 +3,19 @@ package client.commands;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
-import share.network.requests.InfoRequest;
-import share.network.responses.InfoResponse;
+import share.network.requests.ClearRequest;
 
 import java.io.IOException;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'clear'. Удаляет все элементы коллекции.
  */
-public class Info extends Command {
+public class Clear extends Command {
     private final ConsoleView console;
     private final UDPClient client;
 
-    public Info(ConsoleView console, UDPClient client) {
-        super(CommandType.INFO, "вывести информацию о коллекции");
+    public Clear(ConsoleView console, UDPClient client) {
+        super(CommandType.CLEAR, "удалить все элементы коллекции");
         this.console = console;
         this.client = client;
     }
@@ -34,8 +33,8 @@ public class Info extends Command {
         }
 
         try {
-            var response = (InfoResponse) client.sendAndReceiveCommand(new InfoRequest());
-            console.println(response.infoMessage);
+            client.sendAndReceiveCommand(new ClearRequest());
+            console.println("Коллекция очищена");
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");

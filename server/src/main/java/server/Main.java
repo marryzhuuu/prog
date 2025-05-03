@@ -1,12 +1,13 @@
 package server;
 
-import collection.DragonCollection;
-import collection.FileManager;
+import server.collection.DragonCollection;
+import server.collection.FileManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import server.commands.CommandManager;
 import server.commands.*;
 import server.network.UDPDatagramServer;
+import share.commands.CommandType;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,11 +28,21 @@ public class Main {
 
         DragonCollection dragonCollection = new DragonCollection(new FileManager());
 
-
         var commandManager = new CommandManager() {{
-            addCommand("help", new Help(this));
-            addCommand("info", new Info(dragonCollection));
-            addCommand("show", new Show(dragonCollection));
+            addCommand(CommandType.INFO, new Info(dragonCollection));
+            addCommand(CommandType.SHOW, new Show(dragonCollection));
+            addCommand(CommandType.ADD, new Add(dragonCollection));
+            addCommand(CommandType.GET, new GetById(dragonCollection));
+            addCommand(CommandType.UPDATE, new Update(dragonCollection));
+            addCommand(CommandType.REMOVE_BY_ID, new Remove(dragonCollection));
+            addCommand(CommandType.CLEAR, new Clear(dragonCollection));
+            addCommand(CommandType.SAVE, new Save(dragonCollection));
+            addCommand(CommandType.ADD_IF_MAX, new AddIfMax(dragonCollection));
+            addCommand(CommandType.REMOVE_GREATER, new RemoveGreater(dragonCollection));
+            addCommand(CommandType.HISTORY, new History(this));
+            addCommand(CommandType.GROUP_COUNTING_BY_COLOR, new GroupCountingByColor(dragonCollection));
+            addCommand(CommandType.COUNT_GREATER_THAN_AGE, new CountGreaterThanAge(dragonCollection));
+            addCommand(CommandType.FILTER_LESS_THAN_CHARACTER, new FilterLessThanCharacter(dragonCollection));
             // ToDo: остальные команды
         }};
 

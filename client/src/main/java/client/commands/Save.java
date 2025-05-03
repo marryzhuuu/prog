@@ -3,20 +3,19 @@ package client.commands;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
-import share.network.requests.InfoRequest;
-import share.network.responses.InfoResponse;
+import share.network.requests.SaveRequest;
 
 import java.io.IOException;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'save'. Сохраняет коллекцию в дамп.
  */
-public class Info extends Command {
+public class Save extends Command {
     private final ConsoleView console;
     private final UDPClient client;
 
-    public Info(ConsoleView console, UDPClient client) {
-        super(CommandType.INFO, "вывести информацию о коллекции");
+    public Save(ConsoleView console, UDPClient client) {
+        super(CommandType.SAVE, "сохранить все элементы коллекции");
         this.console = console;
         this.client = client;
     }
@@ -34,8 +33,8 @@ public class Info extends Command {
         }
 
         try {
-            var response = (InfoResponse) client.sendAndReceiveCommand(new InfoRequest());
-            console.println(response.infoMessage);
+            client.sendAndReceiveCommand(new SaveRequest());
+            console.println("Коллекция сохранена");
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");

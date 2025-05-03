@@ -1,4 +1,4 @@
-package collection;
+package server.collection;
 import share.exceptions.SaveToFileException;
 import share.model.*;
 
@@ -23,7 +23,7 @@ public class FileManager {
         this.filename = filename;
     }
 
-    public DragonCollection loadFromFile() throws IOException, ParseException {
+    public DragonCollection loadFromFile() {
         try {
             // Читаем JSON из файла
             String json = readFile(filename);
@@ -61,7 +61,7 @@ public class FileManager {
      * @return Коллекция объектов Dragon.
      * @throws ParseException Если произошла ошибка при разборе JSON.
      */
-    private DragonCollection parseJson(String json) throws ParseException, IOException {
+    private DragonCollection parseJson(String json) throws ParseException {
         DragonCollection dragons = new DragonCollection();
         json = json.trim();
 

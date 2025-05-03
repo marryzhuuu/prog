@@ -3,6 +3,7 @@ package client.controller;
 import client.commands.*;
 import client.network.UDPClient;
 import client.view.ConsoleView;
+import share.commands.CommandType;
 
 import java.io.*;
 import java.util.*;
@@ -20,9 +21,22 @@ public class DragonController {
     public DragonController(ConsoleView console, UDPClient client) {
         this.consoleView = console;
         this.commands = new HashMap<>() {{
-            put("help", new Help(console, client));
-            put("info", new Info(console, client));
-            put("show", new Show(console, client));
+            put(CommandType.HELP, new Help(console, this));
+            put(CommandType.INFO, new Info(console, client));
+            put(CommandType.SHOW, new Show(console, client));
+            put(CommandType.ADD, new Add(console, client));
+            put(CommandType.UPDATE, new Update(console, client));
+            put(CommandType.REMOVE_BY_ID, new Remove(console, client));
+            put(CommandType.CLEAR, new Clear(console, client));
+            put(CommandType.SAVE, new Save(console, client));
+            put(CommandType.ADD_IF_MAX, new AddIfMax(console, client));
+            put(CommandType.REMOVE_GREATER, new RemoveGreater(console, client));
+            put(CommandType.HISTORY, new History(console, client));
+            put(CommandType.GROUP_COUNTING_BY_COLOR, new GroupCountingByColor(console, client));
+            put(CommandType.COUNT_GREATER_THAN_AGE, new CountGreaterThanAge(console, client));
+            put(CommandType.FILTER_LESS_THAN_CHARACTER, new FilterLessThanCharacter(console, client));
+            put(CommandType.EXECUTE_SCRIPT, new ExecuteScript(console));
+            put(CommandType.EXIT, new Exit(console));
         }};
     }
 

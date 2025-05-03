@@ -4,16 +4,16 @@ import server.collection.DragonCollection;
 import share.commands.CommandType;
 import share.network.requests.Request;
 import share.network.responses.Response;
-import share.network.responses.ShowResponse;
+import share.network.responses.SaveResponse;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'save'. Сохраняет колекцию в дамп.
  */
-public class Show extends Command {
+public class Save extends Command {
     private final DragonCollection collection;
 
-    public Show(DragonCollection collection) {
-        super(CommandType.SHOW);
+    public Save(DragonCollection collection) {
+        super(CommandType.SAVE);
         this.collection = collection;
     }
 
@@ -24,9 +24,10 @@ public class Show extends Command {
     @Override
     public Response apply(Request request) {
         try {
-            return new ShowResponse(collection.getDragons(), null);
+            collection.save();
+            return new SaveResponse(null);
         } catch (Exception e) {
-            return new ShowResponse(null, e.toString());
+            return new SaveResponse(e.toString());
         }
   }
 }

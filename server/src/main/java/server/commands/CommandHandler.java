@@ -14,6 +14,7 @@ public class CommandHandler {
     public Response handle(Request request) {
         var command = manager.getCommands().get(request.getName());
         if (command == null) return new UnknownCommandResponse(request.getName());
+        manager.addToHistory(command.getName());
         return command.apply(request);
     }
 }

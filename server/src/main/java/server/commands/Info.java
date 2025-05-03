@@ -1,6 +1,7 @@
 package server.commands;
 
-import collection.DragonCollection;
+import server.collection.DragonCollection;
+import share.commands.CommandType;
 import share.network.requests.Request;
 import share.network.responses.InfoResponse;
 import share.network.responses.Response;
@@ -12,7 +13,7 @@ public class Info extends Command {
     private final DragonCollection collection;
 
     public Info(DragonCollection collection) {
-        super("info", "вывести информацию о коллекции");
+        super(CommandType.INFO);
         this.collection = collection;
     }
 

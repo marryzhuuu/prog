@@ -3,17 +3,17 @@ package server.commands;
 import server.collection.DragonCollection;
 import share.commands.CommandType;
 import share.network.requests.Request;
+import share.network.responses.ClearResponse;
 import share.network.responses.Response;
-import share.network.responses.ShowResponse;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'clear'. Удаляет все элементы коллекции.
  */
-public class Show extends Command {
+public class Clear extends Command {
     private final DragonCollection collection;
 
-    public Show(DragonCollection collection) {
-        super(CommandType.SHOW);
+    public Clear(DragonCollection collection) {
+        super(CommandType.CLEAR);
         this.collection = collection;
     }
 
@@ -24,9 +24,10 @@ public class Show extends Command {
     @Override
     public Response apply(Request request) {
         try {
-            return new ShowResponse(collection.getDragons(), null);
+            collection.clear();
+            return new ClearResponse(null);
         } catch (Exception e) {
-            return new ShowResponse(null, e.toString());
+            return new ClearResponse(e.toString());
         }
   }
 }

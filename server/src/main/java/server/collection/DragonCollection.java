@@ -1,4 +1,4 @@
-package collection;
+package server.collection;
 
 import share.exceptions.SaveToFileException;
 import share.model.Color;
@@ -39,6 +39,11 @@ public class DragonCollection {
         dragons.add(dragon);
     }
 
+    public void addDragon(Dragon dragon, boolean nextId) {
+        dragon.setId(Dragon.nextId());
+        dragons.add(dragon);
+    }
+
     public Dragon updateDragon(int id, Dragon updated) {
         Dragon dragon = findDragonById(id);
         return dragon.updateFields(updated);
@@ -67,6 +72,7 @@ public class DragonCollection {
     public Dragon addIfMax(Dragon dragon) {
         Dragon oldestDragon = Collections.max(dragons, Comparator.comparingInt(Dragon::getAge));
         if(dragon.getAge() > oldestDragon.getAge()) {
+            dragon.setId(Dragon.nextId());
             dragons.add(dragon);
             return dragon;
         }

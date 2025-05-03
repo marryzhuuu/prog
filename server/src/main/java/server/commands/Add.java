@@ -2,18 +2,20 @@ package server.commands;
 
 import server.collection.DragonCollection;
 import share.commands.CommandType;
+import share.network.requests.AddRequest;
 import share.network.requests.Request;
+import share.network.responses.AddResponse;
 import share.network.responses.Response;
 import share.network.responses.ShowResponse;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'info'. Добавляет элемент в коллекцию.
  */
-public class Show extends Command {
+public class Add extends Command {
     private final DragonCollection collection;
 
-    public Show(DragonCollection collection) {
-        super(CommandType.SHOW);
+    public Add(DragonCollection collection) {
+        super(CommandType.ADD);
         this.collection = collection;
     }
 
@@ -23,8 +25,10 @@ public class Show extends Command {
      */
     @Override
     public Response apply(Request request) {
+        var req = (AddRequest) request;
         try {
-            return new ShowResponse(collection.getDragons(), null);
+            collection.addDragon(req.dragon, true);
+            return new AddResponse(null);
         } catch (Exception e) {
             return new ShowResponse(null, e.toString());
         }

@@ -2,18 +2,19 @@ package server.commands;
 
 import server.collection.DragonCollection;
 import share.commands.CommandType;
+import share.network.requests.RemoveRequest;
 import share.network.requests.Request;
+import share.network.responses.RemoveResponse;
 import share.network.responses.Response;
-import share.network.responses.ShowResponse;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'remove_by_id'. Удаляет элемент из коллекции.
  */
-public class Show extends Command {
+public class Remove extends Command {
     private final DragonCollection collection;
 
-    public Show(DragonCollection collection) {
-        super(CommandType.SHOW);
+    public Remove(DragonCollection collection) {
+        super(CommandType.REMOVE_BY_ID);
         this.collection = collection;
     }
 
@@ -23,10 +24,12 @@ public class Show extends Command {
      */
     @Override
     public Response apply(Request request) {
+        var req = (RemoveRequest) request;
         try {
-            return new ShowResponse(collection.getDragons(), null);
+            collection.removeDragon(req.id);
+            return new RemoveResponse(null);
         } catch (Exception e) {
-            return new ShowResponse(null, e.toString());
+            return new RemoveResponse(e.toString());
         }
   }
 }

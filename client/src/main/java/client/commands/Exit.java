@@ -3,19 +3,15 @@ package client.commands;
 import client.view.ConsoleView;
 import share.commands.CommandType;
 
-import java.util.HashMap;
-
 /**
- * Команда 'help'. Выводит справку по доступным командам. Выполняется на стороне клиента.
+ * Команда 'exit'. Завершает выполнение клиента.
  */
-public class Help extends Command {
+public class Exit extends Command {
     private final ConsoleView console;
-    private final HashMap<String, Command> commands;
 
-    public Help(ConsoleView console, HashMap<String, Command> commands) {
-        super(CommandType.HELP, "вывести справку по доступным командам");
+    public Exit(ConsoleView console) {
+        super(CommandType.EXIT, "завершить выполнение клиента");
         this.console = console;
-        this.commands = commands;
     }
 
     /**
@@ -30,9 +26,7 @@ public class Help extends Command {
             return false;
         }
 
-        commands.values().forEach(command -> {
-            console.println(command.getName() + ": " + command.getDescription());
-        });
+        console.println("Завершение выполнения клиента...");
         return true;
     }
 }

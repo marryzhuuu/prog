@@ -2,6 +2,7 @@ package client.commands;
 
 import client.network.UDPClient;
 import client.view.ConsoleView;
+import share.commands.CommandType;
 import share.network.requests.ShowRequest;
 import share.network.responses.ShowResponse;
 
@@ -15,7 +16,7 @@ public class Show extends Command {
     private final UDPClient client;
 
     public Show(ConsoleView console, UDPClient client) {
-        super("show");
+        super(CommandType.SHOW, "вывести все элементы коллекции");
         this.console = console;
         this.client = client;
     }

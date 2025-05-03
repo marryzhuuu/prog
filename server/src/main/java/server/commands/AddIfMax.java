@@ -2,18 +2,19 @@ package server.commands;
 
 import server.collection.DragonCollection;
 import share.commands.CommandType;
+import share.network.requests.AddIfMaxRequest;
 import share.network.requests.Request;
+import share.network.responses.AddIfMaxResponse;
 import share.network.responses.Response;
-import share.network.responses.ShowResponse;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'info'. Добавляет элемент в коллекцию.
  */
-public class Show extends Command {
+public class AddIfMax extends Command {
     private final DragonCollection collection;
 
-    public Show(DragonCollection collection) {
-        super(CommandType.SHOW);
+    public AddIfMax(DragonCollection collection) {
+        super(CommandType.ADD_IF_MAX);
         this.collection = collection;
     }
 
@@ -23,10 +24,11 @@ public class Show extends Command {
      */
     @Override
     public Response apply(Request request) {
+        var req = (AddIfMaxRequest) request;
         try {
-            return new ShowResponse(collection.getDragons(), null);
+            return new AddIfMaxResponse(collection.addIfMax(req.dragon), null);
         } catch (Exception e) {
-            return new ShowResponse(null, e.toString());
+            return new AddIfMaxResponse(null, e.toString());
         }
   }
 }

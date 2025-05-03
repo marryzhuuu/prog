@@ -1,8 +1,10 @@
 package share.network.requests;
 
 
+import share.commands.CommandType;
+
 public class ShowRequest extends Request {
     public ShowRequest() {
-        super("show");
+        super(CommandType.SHOW);
     }
 }

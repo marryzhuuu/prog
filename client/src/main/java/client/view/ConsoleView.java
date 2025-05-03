@@ -2,9 +2,6 @@ package client.view;
 
 import client.controller.DragonController;
 
-import share.model.Color;
-import share.model.Dragon;
-
 import java.util.*;
 
 /**
@@ -98,31 +95,4 @@ public class ConsoleView {
     public void commandPrompt() { System.out.print(commandPrompt); }
 
     public void attributePrompt() { System.out.print(attributePrompt); }
-
-    /**
-     * Выводит количество элементов, сгруппированных по цвету.
-     *
-     * @param colorCountMap карта с количеством элементов по цвету
-     */
-    public void displayGroupedByColor(java.util.Map<Color, Long> colorCountMap) {
-        System.out.println("Количество элементов по цвету:");
-        for (java.util.Map.Entry<Color, Long> entry : colorCountMap.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-    }
-
-    /**
-     * Выводит элементы
-     *
-     * @param dragons список драконов
-     */
-    public void displayElementList(List<Dragon> dragons) {
-        if (dragons.isEmpty()) {
-            System.out.println("Нет элементов ");
-        } else {
-            for (Dragon dragon : dragons) {
-                System.out.println(dragon);
-            }
-        }
-    }
 }

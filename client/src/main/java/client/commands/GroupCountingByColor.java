@@ -3,20 +3,20 @@ package client.commands;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
-import share.network.requests.InfoRequest;
-import share.network.responses.InfoResponse;
+import share.network.requests.GroupCountingByColorRequest;
+import share.network.responses.GroupCountingByColorResponse;
 
 import java.io.IOException;
 
 /**
- * Команда 'info'. Выводит информацию о коллекции.
+ * Команда 'group_counting_by_color'. Группирует элементы по цвету.
  */
-public class Info extends Command {
+public class GroupCountingByColor extends Command {
     private final ConsoleView console;
     private final UDPClient client;
 
-    public Info(ConsoleView console, UDPClient client) {
-        super(CommandType.INFO, "вывести информацию о коллекции");
+    public GroupCountingByColor(ConsoleView console, UDPClient client) {
+        super(CommandType.GROUP_COUNTING_BY_COLOR, "сгруппировать элементы по цвету");
         this.console = console;
         this.client = client;
     }
@@ -34,8 +34,8 @@ public class Info extends Command {
         }
 
         try {
-            var response = (InfoResponse) client.sendAndReceiveCommand(new InfoRequest());
-            console.println(response.infoMessage);
+            var response = (GroupCountingByColorResponse) client.sendAndReceiveCommand(new GroupCountingByColorRequest());
+            console.println(response.message);
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");
