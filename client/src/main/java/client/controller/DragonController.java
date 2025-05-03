@@ -1,7 +1,6 @@
 package client.controller;
 
-import client.commands.Command;
-import client.commands.Help;
+import client.commands.*;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 
@@ -22,6 +21,8 @@ public class DragonController {
         this.consoleView = console;
         this.commands = new HashMap<>() {{
             put("help", new Help(console, client));
+            put("info", new Info(console, client));
+            put("show", new Show(console, client));
         }};
     }
 

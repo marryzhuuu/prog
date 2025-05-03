@@ -30,6 +30,8 @@ public class Main {
 
         var commandManager = new CommandManager() {{
             addCommand("help", new Help(this));
+            addCommand("info", new Info(dragonCollection));
+            addCommand("show", new Show(dragonCollection));
             // ToDo: остальные команды
         }};
 

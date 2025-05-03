@@ -1,6 +1,8 @@
 package share.model;
 
-public class DragonCave {
+import java.io.Serializable;
+
+public class DragonCave implements Serializable {
     private int depth;
     private Long numberOfTreasures; //Поле не может быть null, Значение поля должно быть больше 0
 
