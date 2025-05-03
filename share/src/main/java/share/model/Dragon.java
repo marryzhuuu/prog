@@ -1,4 +1,4 @@
-package server.model;
+package share.model;
 import java.util.Date;
 
 public class Dragon {

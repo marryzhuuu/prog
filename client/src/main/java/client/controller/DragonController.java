@@ -1,7 +1,9 @@
 package client.controller;
 
+import client.commands.Command;
+import client.commands.Help;
+import client.network.UDPClient;
 import client.view.ConsoleView;
-import client.commands.CommandManager;
 
 import java.io.*;
 import java.util.*;
@@ -13,12 +15,14 @@ public class DragonController {
         EXIT,
     }
     private final ConsoleView consoleView;
-    private final CommandManager commandManager;
+    private final Map<String, Command> commands;
     private final List<String> scriptStack = new ArrayList<>();
 
-    public DragonController(ConsoleView consoleView, CommandManager commandManager) {
-        this.consoleView = consoleView;
-        this.commandManager = commandManager;
+    public DragonController(ConsoleView console, UDPClient client) {
+        this.consoleView = console;
+        this.commands = new HashMap<>() {{
+            put("help", new Help(console, client));
+        }};
     }
 
     /**
@@ -27,10 +31,9 @@ public class DragonController {
      * @return Код завершения.
      */
     public ExitCode executeCommand(String[] userCommand) {
-        commandManager.addToHistory(userCommand[0]);
 
         if (userCommand[0].isEmpty()) return ExitCode.OK;
-        var command = commandManager.getCommands().get(userCommand[0]);
+        var command = commands.get(userCommand[0]);
 
         if (command == null) {
             consoleView.printError("Команда '" + userCommand[0] + "' не найдена. Наберите 'help' для справки");
@@ -39,11 +42,11 @@ public class DragonController {
 
         switch (userCommand[0]) {
             case "exit" -> {
-                if (!commandManager.getCommands().get("exit").apply(userCommand)) return ExitCode.ERROR;
+                if (!commands.get("exit").apply(userCommand)) return ExitCode.ERROR;
                 else return ExitCode.EXIT;
             }
             case "execute_script" -> {
-                if (!commandManager.getCommands().get("execute_script").apply(userCommand)) return ExitCode.ERROR;
+                if (!commands.get("execute_script").apply(userCommand)) return ExitCode.ERROR;
                 else return executeScript(userCommand[1]);
             }
             default -> { if (!command.apply(userCommand)) return ExitCode.ERROR; }

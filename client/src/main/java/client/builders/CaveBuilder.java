@@ -1,6 +1,6 @@
 package client.builders;
 
-import client.model.DragonCave;
+import share.model.DragonCave;
 import client.view.ConsoleView;
 
 public class CaveBuilder extends Builder<DragonCave> {

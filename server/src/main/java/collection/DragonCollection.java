@@ -1,6 +1,9 @@
-package server.model;
+package collection;
 
 import share.exceptions.SaveToFileException;
+import share.model.Color;
+import share.model.Dragon;
+import share.model.DragonCharacter;
 
 import java.io.IOException;
 import java.text.ParseException;

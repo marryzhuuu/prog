@@ -38,6 +38,7 @@ subprojects {
 project(':client') {
     dependencies {
         implementation project(':share')
+        implementation 'com.google.guava:guava:31.1-jre'
     }
     application {
         mainClass = 'client.Main' // Замените на ваш главный класс

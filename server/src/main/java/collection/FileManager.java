@@ -1,5 +1,6 @@
-package server.model;
+package collection;
 import share.exceptions.SaveToFileException;
+import share.model.*;
 
 import java.io.*;
 import java.text.ParseException;

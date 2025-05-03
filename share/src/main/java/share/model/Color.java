@@ -1,4 +1,4 @@
-package server.model;
+package share.model;
 
 public enum Color {
     RED,

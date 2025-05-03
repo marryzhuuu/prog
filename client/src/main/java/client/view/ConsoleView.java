@@ -2,8 +2,8 @@ package client.view;
 
 import client.controller.DragonController;
 
-import client.model.Color;
-import client.model.Dragon;
+import share.model.Color;
+import share.model.Dragon;
 
 import java.util.*;
 

@@ -1,6 +1,7 @@
 package client.builders;
 
 import client.view.ConsoleView;
+import share.model.*;
 
 public class DragonBuilder extends Builder<Dragon> {
     private final ConsoleView console;

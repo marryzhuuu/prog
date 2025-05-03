@@ -1,11 +1,11 @@
 package server;
 
+import collection.DragonCollection;
+import collection.FileManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import server.commands.CommandManager;
 import server.commands.*;
-import server.model.DragonCollection;
-import server.model.FileManager;
 import server.network.UDPDatagramServer;
 
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package server.model;
+package share.model;
 
 public class DragonCave {
     private int depth;
