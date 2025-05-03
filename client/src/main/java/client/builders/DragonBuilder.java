@@ -1,6 +1,5 @@
-package client.model.builders;
+package client.builders;
 
-import client.model.*;
 import client.model.*;
 import client.view.ConsoleView;
 

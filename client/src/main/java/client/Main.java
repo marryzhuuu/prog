@@ -1,6 +1,6 @@
 package client;
 
-import server.controller.DragonController;
+import client.controller.DragonController;
 import client.model.DragonCollection;
 import client.model.FileManager;
 import client.view.ConsoleView;

@@ -1,7 +1,6 @@
-package client.model.builders;
+package client.builders;
 
 import client.model.Coordinates;
-import client.model.*;
 import client.view.ConsoleView;
 
 public class CoordinatesBuilder extends Builder<Coordinates> {

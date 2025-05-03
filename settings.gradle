@@ -1,2 +1,5 @@
 rootProject.name = 'labprog'
-include 'share', 'server', 'client'
+
+include 'client'
+include 'server'
+include 'share'

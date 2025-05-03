@@ -1,4 +1,4 @@
-package server.controller;
+package client.controller;
 
 import client.view.ConsoleView;
 import client.commands.CommandManager;

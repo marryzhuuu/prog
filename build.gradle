@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'application'
+
+    version = '1.0'
+
+    repositories {
+        mavenCentral() // Или другие ваши репозитории
+    }
+
+    dependencies {
+        // Общие зависимости для всех подпроектов
+        implementation 'org.slf4j:slf4j-api:1.7.36' // Пример
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+        implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    jar {
+        manifest {
+            attributes 'Implementation-Title': project.name,
+                    'Implementation-Version': project.version
+        }
+    }
+}
+
+project(':client') {
+    dependencies {
+        implementation project(':share')
+    }
+    application {
+        mainClass = 'client.Main' // Замените на ваш главный класс
+    }
+}
+
+project(':server') {
+    dependencies {
+        implementation project(':share')
+    }
+    application {
+        mainClass = 'server.Main' // Замените на ваш главный класс
+    }
+}
+
+//project(':share') {
+//    // Конфигурация для модуля share (если необходимо)
+//}

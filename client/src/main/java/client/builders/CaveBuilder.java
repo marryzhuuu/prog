@@ -1,6 +1,5 @@
-package client.model.builders;
+package client.builders;
 
-import client.model.Coordinates;
 import client.model.DragonCave;
 import client.view.ConsoleView;
 

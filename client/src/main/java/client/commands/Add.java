@@ -2,7 +2,7 @@ package client.commands;
 
 import client.model.DragonCollection;
 import client.view.ConsoleView;
-import client.model.builders.DragonBuilder;
+import client.builders.DragonBuilder;
 
 /**
  * Команда 'add'. Добавляет новый элемент в коллекцию.

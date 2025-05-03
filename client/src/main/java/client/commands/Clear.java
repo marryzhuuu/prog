@@ -6,7 +6,6 @@ import client.view.ConsoleView;
 
 /**
  * Команда 'clear'. Очищает коллекцию.
- * @author maxbarsukov
  */
 public class Clear extends Command {
     private final ConsoleView console;

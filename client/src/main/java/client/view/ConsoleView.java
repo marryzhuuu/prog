@@ -1,6 +1,6 @@
 package client.view;
 
-import server.controller.DragonController;
+import client.controller.DragonController;
 
 import client.model.Color;
 import client.model.Dragon;

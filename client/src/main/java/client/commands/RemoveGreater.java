@@ -2,7 +2,7 @@ package client.commands;
 
 import client.model.Dragon;
 import client.model.DragonCollection;
-import client.model.builders.DragonBuilder;
+import client.builders.DragonBuilder;
 import client.view.ConsoleView;
 
 /**

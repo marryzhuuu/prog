@@ -1,4 +1,4 @@
-package client.model.builders;
+package client.builders;
 
 /**
  * Абстрактный класс для ввода пользовательских данных.
