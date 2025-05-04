@@ -20,13 +20,25 @@ import java.text.ParseException;
  * Серверная часть приложения.
  */
 public class Main {
-    public static final int PORT = 23586;
+    public static final int PORT = 7001;
+    private static DragonCollection dragonCollection; // статический для использования в shutdown hook
 
     public static Logger logger = LogManager.getLogger("ServerLogger");
 
     public static void main(String[] args) throws IOException, ParseException {
 
-        DragonCollection dragonCollection = new DragonCollection(new FileManager());
+        dragonCollection = new DragonCollection(new FileManager());
+
+        // Добавляем shutdown hook для сохранения коллекции при завершении работы сервера
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                logger.info("Сервер завершает работу, сохраняем коллекцию...");
+                dragonCollection.save();
+                logger.info("Коллекция успешно сохранена");
+            } catch (Exception e) {
+                logger.error("Ошибка при сохранении коллекции при завершении работы", e);
+            }
+        }));
 
         var commandManager = new CommandManager() {{
             addCommand(CommandType.INFO, new Info(dragonCollection));

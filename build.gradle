@@ -1,56 +1,75 @@
 plugins {
     id 'java'
-    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2' // or newer
 }
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'application'
-
-    version = '1.0'
+    group 'org.example'
+    version '1.0-SNAPSHOT'
 
     repositories {
-        mavenCentral() // Или другие ваши репозитории
+        mavenCentral()
     }
 
     dependencies {
-        // Общие зависимости для всех подпроектов
-        implementation 'org.slf4j:slf4j-api:1.7.36' // Пример
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-        implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
-        implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
-        implementation 'org.apache.commons:commons-lang3:3.12.0'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     }
 
     test {
         useJUnitPlatform()
     }
-
-    jar {
-        manifest {
-            attributes 'Implementation-Title': project.name,
-                    'Implementation-Version': project.version
-        }
-    }
-}
-
-project(':client') {
-    dependencies {
-        implementation project(':share')
-        implementation 'com.google.guava:guava:31.1-jre'
-    }
-    application {
-        mainClass = 'client.Main' // Замените на ваш главный класс
-    }
 }
 
 project(':server') {
+    apply plugin: 'application'
+    apply plugin: 'com.github.johnrengelman.shadow'
+    mainClassName = 'server.Main'
+
     dependencies {
         implementation project(':share')
+        implementation 'com.google.code.gson:gson:2.10.1'
         implementation 'com.google.guava:guava:31.1-jre'
+        implementation 'org.apache.commons:commons-lang3:3.12.0'
+        implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+        implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
     }
-    application {
-        mainClass = 'server.Main' // Замените на ваш главный класс
+
+    shadowJar {
+        archiveFileName.set("server.jar")
+        archiveClassifier.set('')
+        destinationDirectory = file("$rootDir/build")
+        manifest {
+            attributes 'Main-Class': 'server.Main'
+        }
     }
+
+}
+
+project(':client') {
+    apply plugin: 'application'
+    apply plugin: 'com.github.johnrengelman.shadow'
+    mainClassName = 'client.Main'
+    dependencies {
+        implementation project(':share')
+        implementation 'org.apache.commons:commons-lang3:3.12.0'
+        implementation 'com.google.guava:guava:31.1-jre'
+        implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+        implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+    }
+
+    run {
+        standardInput = System.in
+    }
+
+    shadowJar {
+        archiveFileName.set("client.jar")
+        archiveClassifier.set('')
+        destinationDirectory = file("$rootDir/build")
+        manifest {
+            attributes 'Main-Class': 'client.Main'
+        }
+    }
+
 }

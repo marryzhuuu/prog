@@ -40,8 +40,7 @@ public class UDPDatagramServer extends UDPServer {
             datagramSocket.receive(dp);
 
             addr = dp.getSocketAddress();
-            logger.info("Получено \"" + new String(data) + "\" от " + dp.getAddress());
-            logger.info("Последний байт: " + data[data.length - 1]);
+            logger.info("Получено " + String.valueOf(data.length) + "байт от " + dp.getAddress());
 
             if (data[data.length - 1] == 1) {
                 received = true;

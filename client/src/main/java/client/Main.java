@@ -15,7 +15,7 @@ import java.net.InetAddress;
  */
 public class Main {
     public static final Logger logger = LogManager.getLogger("ClientLogger");
-    private static final int PORT = 23586;
+    private static final int PORT = 7001;
 
     public static void main(String[] args) {
 
