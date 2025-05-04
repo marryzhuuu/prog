@@ -2,7 +2,7 @@ package share.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Dragon implements Serializable {
+public class Dragon implements Serializable, Comparable<Dragon> {
     private static int nextId=1;
 
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
@@ -118,6 +118,15 @@ public class Dragon implements Serializable {
                 cave
         );
 
+    }
+
+    /**
+     * Необходим для Comparable
+     * Сортировка по умолчанию - по id
+     */
+    @Override
+    public int compareTo(Dragon d) {
+        return (this.id - d.getId());
     }
 }
 

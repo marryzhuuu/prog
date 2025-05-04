@@ -5,7 +5,6 @@ import java.io.Serializable;
 public class Coordinates implements Serializable {
     private double x;
 
-//    ToDo: реализовать проверку
     private float y; //Значение поля должно быть больше -948
 
     public Coordinates(double x, double y) {

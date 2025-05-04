@@ -61,6 +61,12 @@ public class DragonCollection {
         return dragons;
     }
 
+    public Vector<Dragon> sorted() {
+        return dragons.stream()
+            .sorted()
+            .collect(Collectors.toCollection(Vector::new));
+    }
+
     public int size() {
         return this.dragons.size();
     }

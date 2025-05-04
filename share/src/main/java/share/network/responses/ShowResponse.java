@@ -3,12 +3,12 @@ package share.network.responses;
 import share.commands.CommandType;
 import share.model.Dragon;
 
-import java.util.List;
+import java.util.Vector;
 
 public class ShowResponse extends Response {
-    public final List<Dragon> dragons;
+    public final Vector<Dragon> dragons;
 
-    public ShowResponse(List<Dragon> dragons, String error) {
+    public ShowResponse(Vector<Dragon> dragons, String error) {
         super(CommandType.SHOW, error);
         this.dragons = dragons;
     }
