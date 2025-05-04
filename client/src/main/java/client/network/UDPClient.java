@@ -74,8 +74,7 @@ public class UDPClient {
 
         while(!received) {
             var data = receiveData(PACKET_SIZE);
-            logger.info("Получено \"" + new String(data) + "\"");
-            logger.info("Последний байт: " + data[data.length - 1]);
+            logger.info("Получено " + String.valueOf(data.length) + "байт");
 
             if (data[data.length - 1] == 1) {
                 received = true;
