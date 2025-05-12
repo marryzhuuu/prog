@@ -20,12 +20,17 @@ import java.text.ParseException;
  * Серверная часть приложения.
  */
 public class Main {
-    public static final int PORT = 7001;
+    private static final int DEFAULT_PORT = 25001;
+
+
+
     private static DragonCollection dragonCollection; // статический для использования в shutdown hook
 
     public static Logger logger = LogManager.getLogger("ServerLogger");
 
     public static void main(String[] args) throws IOException, ParseException {
+
+
 
         dragonCollection = new DragonCollection(new FileManager());
 
@@ -58,8 +63,9 @@ public class Main {
         }};
 
         try {
-            var server = new UDPDatagramServer(InetAddress.getLocalHost(), PORT, new CommandHandler(commandManager));
-            // ToDo: сохранение коллекции перед завершением работы ссервера
+            int port = args.length > 0 ? parsePort(args[0]) : DEFAULT_PORT;
+            var server = new UDPDatagramServer(InetAddress.getLocalHost(), port, new CommandHandler(commandManager));
+
             server.run();
         } catch (SocketException e) {
             logger.fatal("Ошибка сокета", e);
@@ -67,5 +73,17 @@ public class Main {
             logger.fatal("Неизвестный хост", e);
         }
 
+    }
+
+    private static int parsePort(String portStr) throws IllegalArgumentException {
+        try {
+            int port = Integer.parseInt(portStr);
+            if (port < 0 || port > 65535) {
+                throw new IllegalArgumentException("Номер порта должен быть в диапазоне от 0 до 65535");
+            }
+            return port;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Номер порта должен быть целым числом");
+        }
     }
 }
