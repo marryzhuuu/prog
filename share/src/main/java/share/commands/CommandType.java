@@ -27,4 +27,8 @@ public interface CommandType {
     // Системные команды
     String EXECUTE_SCRIPT = "execute_script"; // выполняется на стороне клиента
     String GET = "get"; // выполняется только на стороне сервера (нет в списке команд на клиентской стороне)
+
+    // Регистрация/авторизация
+    String REGISTER = "register";
+    String LOGIN = "login";
 }

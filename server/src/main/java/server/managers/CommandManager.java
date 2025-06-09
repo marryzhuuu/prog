@@ -1,4 +1,6 @@
-package server.commands;
+package server.managers;
+
+import server.commands.Command;
 
 import java.util.ArrayList;
 import java.util.HashMap;

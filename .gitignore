@@ -38,3 +38,6 @@ bin/
 
 # Ignore Gradle build output directory
 build
+
+# Ignore developement .env files
+.env.dev

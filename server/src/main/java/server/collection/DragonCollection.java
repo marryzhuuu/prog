@@ -1,6 +1,8 @@
 package server.collection;
 
-import share.exceptions.SaveToFileException;
+import org.apache.logging.log4j.Logger;
+import server.Main;
+import server.managers.PersistenceManager;
 import share.model.Color;
 import share.model.Dragon;
 import share.model.DragonCharacter;
@@ -8,6 +10,7 @@ import share.model.DragonCharacter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -16,19 +19,49 @@ import java.util.stream.Collectors;
 public class DragonCollection {
     private Vector<Dragon> dragons;
     private final Date date;
-    private FileManager fileManager;
+    private final PersistenceManager persistenceManager;
+    private final Logger logger = Main.logger;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public DragonCollection() {
         dragons = new Vector<>();
         date = new Date();
+//        ToDo: проверять
+        persistenceManager = null;
     }
 
-    public DragonCollection(FileManager fileManager) throws IOException, ParseException {
+    public DragonCollection(PersistenceManager persistenceManager) throws IOException, ParseException {
         dragons = new Vector<>();
         date = new Date();
-        this.fileManager = fileManager;
+        this.persistenceManager = persistenceManager;
 
-        this.dragons = fileManager.loadFromFile().getDragons();
+//        this.dragons = fileManager.loadFromFile().getDragons();
+        try {
+            load();
+        } catch (Exception e) {
+            logger.fatal("Ошибка загрузки продуктов из базы данных!", e);
+            System.exit(3);
+        }
+
+    }
+
+    /**
+     * Загружает коллекцию из базы данных.
+     */
+    private void load() {
+        logger.info("Загрузка коллекции...");
+
+        lock.lock();
+        dragons = new Vector<Dragon>();
+//        var dragonsORM = persistenceManager.loadDragons();
+//        var savedDragons = dragonsORM.stream().map((dao) -> {
+//            ToDo: загрузка из БД
+//            return new DragonCollection().getDragons();
+//        }).toList();
+//        ToDo: добавить в коллекцию
+//        dragons.addAll(savedDragons);
+        lock.unlock();
+        logger.info("Загрузка завершена.");
     }
 
     public Date getDate() {
@@ -108,7 +141,7 @@ public class DragonCollection {
                 .collect(Collectors.toList());
     }
 
-    public void save() throws SaveToFileException {
-        fileManager.saveToFile(this);
+    public void save() {
+//        ToDo: в БД
     }
 }

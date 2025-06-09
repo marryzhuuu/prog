@@ -1,5 +1,6 @@
 package server.commands;
 
+import server.managers.CommandManager;
 import share.network.requests.Request;
 import share.network.responses.Response;
 import share.network.responses.UnknownCommandResponse;

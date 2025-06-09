@@ -1,24 +1,27 @@
 package client.commands;
 
 import client.builders.DragonBuilder;
+import client.builders.UserBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
 import share.exceptions.APIException;
 import share.network.requests.AddRequest;
+import share.network.requests.RegisterRequest;
 import share.network.responses.AddResponse;
+import share.network.responses.RegisterResponse;
 
 import java.io.IOException;
 
 /**
- * Команда 'add'. Добавляет элемент в коллекцию.
+ * Команда 'register'. Добавляет элемент в коллекцию.
  */
-public class Add extends Command {
+public class Register extends Command {
     private final ConsoleView console;
     private final UDPClient client;
 
-    public Add(ConsoleView console, UDPClient client) {
-        super(CommandType.ADD + " {element}", "добавить элемент в коллекцию");
+    public Register(ConsoleView console, UDPClient client) {
+        super(CommandType.REGISTER + " {user}", "зарегистрировать пользователя");
         this.console = console;
         this.client = client;
     }
@@ -36,14 +39,14 @@ public class Add extends Command {
         }
 
         try {
-            console.println("* Создание нового дракона:");
+            console.println("* Регистрация пользователя:");
 
-            var newDragon = new DragonBuilder(console).build();
-            var response = (AddResponse) client.sendAndReceiveCommand(new AddRequest(newDragon));
+            var user = new UserBuilder(console).build();
+            var response = (RegisterResponse) client.sendAndReceiveCommand(new RegisterRequest(user));
             if (response.getError() != null && !response.getError().isEmpty()) {
                 throw new APIException(response.getError());
             }
-            console.println("Дракон успешно добавлен");
+            console.println("Пользователь " + response.user.getName() + " успешно добавлен");
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");

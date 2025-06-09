@@ -19,7 +19,7 @@ public class Coordinates implements Serializable {
         return this.x;
     }
 
-    public double getY() {
+    public float getY() {
         return this.y;
     }
 
