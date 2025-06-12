@@ -80,6 +80,8 @@ public class Dragon implements Serializable, Comparable<Dragon> {
         return cave;
     }
 
+    public Integer getCreatorId() { return creatorId; }
+
     public Dragon updateFields(Dragon updated) {
         name = updated.name;
         coordinates = updated.coordinates;

@@ -12,6 +12,7 @@ import share.model.User;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -38,7 +39,6 @@ public class DragonCollection {
         date = LocalDate.now();
         this.persistenceManager = persistenceManager;
 
-//        this.dragons = fileManager.loadFromFile().getDragons();
         try {
             load();
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class DragonCollection {
         dragons = new Vector<Dragon>();
 //        var dragonsORM = persistenceManager.loadDragons();
 //        var savedDragons = dragonsORM.stream().map((dao) -> {
-//            ToDo: загрузка из БД
+//            ToDo: загрузка из БД ТОЛЬКО СВОИХ ДРАКОНОВ!!!!!!!!!!!
 //            return new DragonCollection().getDragons();
 //        }).toList();
 //        ToDo: добавить в коллекцию
@@ -111,15 +111,21 @@ public class DragonCollection {
         return this.dragons.size();
     }
 
-    public void clear() {
-        this.dragons.clear();
+    public void clear(User user) {
+        persistenceManager.clear(user);
+        lock.lock();
+        dragons.removeIf(dragon -> dragon.getCreatorId() == user.getId());
+        lock.unlock();
     }
 
     public Dragon addIfMax(User user, Dragon dragon) throws EmptyCollectionException {
         Dragon oldestDragon = null;
         if(!dragons.isEmpty()) {
-            oldestDragon = Collections.max(dragons, Comparator.comparingInt(Dragon::getAge));
-        }
+            // Фильтруем драконов по creationId пользователя и находим максимальный возраст
+            oldestDragon = dragons.stream()
+                    .filter(d -> d.getCreatorId() == user.getId())
+                    .max(Comparator.comparingInt(Dragon::getAge))
+                    .orElse(null);        }
         if(oldestDragon==null || dragon.getAge() > oldestDragon.getAge()) {
             var newId = persistenceManager.add(user, dragon);
             logger.info("Новый дракон добавлен в БД.");

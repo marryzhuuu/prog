@@ -40,7 +40,7 @@ public class PersistenceManager {
   }
 
   public int add(User user, Dragon dragon) {
-    logger.info("Добавление нового дракона..." + dragon.getName());
+    logger.info("Добавление нового дракона в БД..." + dragon.getName());
 
     var dragonORM = new DragonORM(dragon);
     dragonORM.setCreator(new UserORM(user));
@@ -63,6 +63,27 @@ public class PersistenceManager {
       }
     }
   }
+
+  public void clear(User user) {
+    logger.info("Удаление драконов пользователя id#" + user.getId() + " из БД...");
+    try (var session = sessionFactory.getCurrentSession()) {
+      var transaction = session.beginTransaction();
+      try {
+        var query = session.createQuery("DELETE FROM dragons WHERE creator.id = :creator");
+        query.setParameter("creator", user.getId());
+        var deletedSize = query.executeUpdate();
+        transaction.commit();
+        logger.info("Удалено " + deletedSize + " продуктов.");
+      } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+          transaction.rollback();
+        }
+        throw e;
+      }
+    }
+  }
+
+
 
   //  ToDo: методы работы с БД
 }
