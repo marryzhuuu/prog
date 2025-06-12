@@ -4,6 +4,7 @@ import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
+import share.exceptions.AuthentificationException;
 import share.network.requests.HistoryRequest;
 import share.network.responses.HistoryResponse;
 
@@ -40,6 +41,8 @@ public class History extends Command {
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");
+        } catch (AuthentificationException e) {
+            console.printError(e.getMessage());
         }
         return false;
     }

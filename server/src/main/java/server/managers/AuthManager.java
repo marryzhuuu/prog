@@ -35,11 +35,18 @@ public class AuthManager {
     userORM.setPasswordDigest(passwordHash);
     userORM.setSalt(salt);
 
-    var session = sessionFactory.getCurrentSession();
-    session.beginTransaction();
-    session.persist(userORM);
-    session.getTransaction().commit();
-    session.close();
+    try (var session = sessionFactory.getCurrentSession()) {
+      var transaction = session.beginTransaction();
+      try {
+        session.persist(userORM);
+        transaction.commit();
+      } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+          transaction.rollback();
+        }
+        throw e;
+      }
+    }
 
     var newId = userORM.getId();
     logger.info("Пользователь успешно создан, id#" + newId);
@@ -48,38 +55,45 @@ public class AuthManager {
 
   public int loginUser(String login, String password) throws SQLException, WrongPasswordException {
     logger.info("Аутентификация пользователя " + login);
-    var session = sessionFactory.getCurrentSession();
-    session.beginTransaction();
+    try (var session = sessionFactory.getCurrentSession()) {
+      var transaction = session.beginTransaction();
+      try {
+        var query = session.createQuery("SELECT u FROM users u WHERE u.name = :name");
+        query.setParameter("name", login);
 
-    var query = session.createQuery("SELECT u FROM users u WHERE u.name = :name");
-    query.setParameter("name", login);
+        List<UserORM> result = (List<UserORM>) query.list();
 
-    List<UserORM> result = (List<UserORM>) query.list();
+        if (result.isEmpty()) {
+          logger.warn("Пользователь " + login + " не существует.");
+          return 0;
+        }
 
-    if (result.isEmpty()) {
-      logger.warn("Пользователь " + login + " не существует.");
-      return 0;
+        var user = result.getFirst();
+        session.getTransaction().commit();
+        session.close();
+
+        var id = user.getId();
+        var salt = user.getSalt();
+        var expectedHashedPassword = user.getPasswordDigest();
+
+        var actualHashedPassword = generatePasswordHash(password, salt);
+        if (expectedHashedPassword.equals(actualHashedPassword)) {;
+          logger.info("Пользователь " + login + " аутентифицирован c id#" + id);
+          return id;
+        }
+
+        logger.warn(
+                "Неправильный пароль для пользователя " + login +
+                        ". Ожидалось '" + expectedHashedPassword + "', получено '" + actualHashedPassword + "'"
+        );
+        throw new WrongPasswordException("Неправильный пароль пользователя");
+      } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+          transaction.rollback();
+        }
+        throw e;
+      }
     }
-
-    var user = result.getFirst();
-    session.getTransaction().commit();
-    session.close();
-
-    var id = user.getId();
-    var salt = user.getSalt();
-    var expectedHashedPassword = user.getPasswordDigest();
-
-    var actualHashedPassword = generatePasswordHash(password, salt);
-    if (expectedHashedPassword.equals(actualHashedPassword)) {;
-      logger.info("Пользователь " + login + " аутентифицирован c id#" + id);
-      return id;
-    }
-
-    logger.warn(
-      "Неправильный пароль для пользователя " + login +
-        ". Ожидалось '" + expectedHashedPassword + "', получено '" + actualHashedPassword + "'"
-    );
-    throw new WrongPasswordException("Неправильный пароль пользователя");
   }
 
   private String generateSalt() {

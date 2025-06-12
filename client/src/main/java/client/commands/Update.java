@@ -5,6 +5,7 @@ import client.builders.DragonBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
+import share.exceptions.AuthentificationException;
 import share.exceptions.NotFoundException;
 import share.model.Dragon;
 import share.network.requests.GetByIdRequest;
@@ -63,6 +64,8 @@ public class Update extends Command {
             console.printError("Элемент не найден");
         } catch (NumberFormatException e) {
             console.printError("ID элемента должен быть целым числом");
+        } catch (AuthentificationException e) {
+            console.printError(e.getMessage());
         }
         return false;
     }

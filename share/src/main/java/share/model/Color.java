@@ -1,8 +1,10 @@
 package share.model;
 
-public enum Color {
+import java.io.Serializable;
+
+public enum Color implements Serializable {
     RED,
     ORANGE,
     WHITE,
-    BROWN;
+    BROWN
 }

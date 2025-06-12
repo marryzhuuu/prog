@@ -6,6 +6,7 @@ import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
 import share.exceptions.APIException;
+import share.exceptions.AuthentificationException;
 import share.network.requests.AddIfMaxRequest;
 import share.network.responses.AddIfMaxResponse;
 
@@ -52,7 +53,7 @@ public class AddIfMax extends Command {
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");
-        } catch (APIException e) {
+        } catch (APIException | AuthentificationException e) {
             console.printError(e.getMessage());
         }
         return false;

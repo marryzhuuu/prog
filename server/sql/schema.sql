@@ -1,13 +1,5 @@
 BEGIN;
 
-CREATE TYPE dragon_character AS ENUM (
-    'CUNNING', 'EVIL', 'GOOD', 'CHAOTIC_EVIL', 'FICKLE'
-);
-
-CREATE TYPE color AS ENUM (
-    'RED', 'ORANGE', 'WHITE', 'BROWN'
-);
-
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(40) UNIQUE NOT NULL,
@@ -23,8 +15,8 @@ CREATE TABLE IF NOT EXISTS dragons (
     creation_date DATE DEFAULT NOW() NOT NULL,
     age INT NOT NULL,
     description TEXT NOT NULL,
-    color color NOT NULL,
-    character dragon_character NOT NULL,
+    color TEXT NOT NULL CHECK (color = ANY (ARRAY['RED', 'ORANGE', 'WHITE', 'BROWN'])),
+    temper TEXT NOT NULL CHECK (temper = ANY (ARRAY['CUNNING', 'EVIL', 'GOOD', 'CHAOTIC_EVIL', 'FICKLE'])),
     cave_depth INT NOT NULL,
     cave_treasures BIGINT NOT NULL,
     creator_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE

@@ -3,6 +3,9 @@ package client.builders;
 import client.view.ConsoleView;
 import share.model.*;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 public class DragonBuilder extends Builder<Dragon> {
     private final ConsoleView console;
 
@@ -13,25 +16,29 @@ public class DragonBuilder extends Builder<Dragon> {
     @Override
     public Dragon build() {
         return new Dragon(
+            1,
             getName(),
             getCoordinates(),
             getAge(),
             getDescription(),
             getColor(),
-            getCharacter(),
-            getCave()
+            getTemper(),
+            getCave(),
+            LocalDate.now()
         );
     }
 
     public Dragon update(Dragon dragon) {
         return new Dragon(
+            1,
             getName(dragon),
             getCoordinates(dragon.getCoordinates()),
             getAge(dragon),
             getDescription(dragon),
             getColor(dragon),
-            getCharacter(dragon),
-            getCave(dragon.getCave())
+            getTemper(dragon),
+            getCave(dragon.getCave()),
+            dragon.getCreationDate()
         );
     }
 
@@ -229,7 +236,7 @@ public class DragonBuilder extends Builder<Dragon> {
     /**
      * Ввод характера (не может быть null, должен быть одним из значений enum DragonCharacter)
      */
-    DragonCharacter getCharacter() {
+    DragonCharacter getTemper() {
         DragonCharacter character;
         while (true) {
             console.println("Характер (CUNNING, EVIL, CHAOTIC_EVIL, FICKLE, GOOD): ");
@@ -247,9 +254,9 @@ public class DragonBuilder extends Builder<Dragon> {
         return character;
     }
 
-    DragonCharacter getCharacter(Dragon dragon) {
+    DragonCharacter getTemper(Dragon dragon) {
         DragonCharacter character;
-        DragonCharacter currentCharacter=dragon.getCharacter();
+        DragonCharacter currentCharacter=dragon.getTemper();
         console.println("Текущий характер: " + currentCharacter);
         while (true) {
             console.println("Характер (CUNNING, EVIL, GOOD, CHAOTIC_EVIL, FICKLE): ");

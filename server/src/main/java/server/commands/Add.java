@@ -27,7 +27,7 @@ public class Add extends Command {
     public Response apply(Request request) {
         var req = (AddRequest) request;
         try {
-            collection.addDragon(req.dragon, true);
+            collection.addDragon(req.getUser(), req.dragon);
             return new AddResponse(null);
         } catch (Exception e) {
             return new ShowResponse(null, e.toString());

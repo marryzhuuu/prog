@@ -3,12 +3,15 @@ package server.collection;
 import org.apache.logging.log4j.Logger;
 import server.Main;
 import server.managers.PersistenceManager;
+import share.exceptions.EmptyCollectionException;
 import share.model.Color;
 import share.model.Dragon;
 import share.model.DragonCharacter;
+import share.model.User;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -18,21 +21,21 @@ import java.util.stream.Collectors;
  */
 public class DragonCollection {
     private Vector<Dragon> dragons;
-    private final Date date;
+    private final LocalDate date;
     private final PersistenceManager persistenceManager;
     private final Logger logger = Main.logger;
     private final ReentrantLock lock = new ReentrantLock();
 
     public DragonCollection() {
         dragons = new Vector<>();
-        date = new Date();
+        date = LocalDate.now();
 //        ToDo: проверять
         persistenceManager = null;
     }
 
     public DragonCollection(PersistenceManager persistenceManager) throws IOException, ParseException {
         dragons = new Vector<>();
-        date = new Date();
+        date = LocalDate.now();
         this.persistenceManager = persistenceManager;
 
 //        this.dragons = fileManager.loadFromFile().getDragons();
@@ -64,7 +67,7 @@ public class DragonCollection {
         logger.info("Загрузка завершена.");
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return this.date;
     }
 
@@ -72,9 +75,13 @@ public class DragonCollection {
         dragons.add(dragon);
     }
 
-    public void addDragon(Dragon dragon, boolean nextId) {
-        dragon.setId(Dragon.nextId());
-        dragons.add(dragon);
+    public void addDragon(User user, Dragon dragon) {
+        var newId = persistenceManager.add(user, dragon);
+        logger.info("Новый дракон добавлен в БД.");
+
+        lock.lock();
+        dragons.add(dragon.copy(newId, user.getId()));
+        lock.unlock();
     }
 
     public Dragon updateDragon(int id, Dragon updated) {
@@ -108,11 +115,18 @@ public class DragonCollection {
         this.dragons.clear();
     }
 
-    public Dragon addIfMax(Dragon dragon) {
-        Dragon oldestDragon = Collections.max(dragons, Comparator.comparingInt(Dragon::getAge));
-        if(dragon.getAge() > oldestDragon.getAge()) {
-            dragon.setId(Dragon.nextId());
-            dragons.add(dragon);
+    public Dragon addIfMax(User user, Dragon dragon) throws EmptyCollectionException {
+        Dragon oldestDragon = null;
+        if(!dragons.isEmpty()) {
+            oldestDragon = Collections.max(dragons, Comparator.comparingInt(Dragon::getAge));
+        }
+        if(oldestDragon==null || dragon.getAge() > oldestDragon.getAge()) {
+            var newId = persistenceManager.add(user, dragon);
+            logger.info("Новый дракон добавлен в БД.");
+
+            lock.lock();
+            dragons.add(dragon.copy(newId, user.getId()));
+            lock.unlock();
             return dragon;
         }
         return null;
@@ -137,7 +151,7 @@ public class DragonCollection {
 
     public List<Dragon> filterLessThanCharacter(DragonCharacter character) {
         return dragons.stream()
-                .filter(dragon -> dragon.getCharacter().compareTo(character) < 0)
+                .filter(dragon -> dragon.getTemper().compareTo(character) < 0)
                 .collect(Collectors.toList());
     }
 

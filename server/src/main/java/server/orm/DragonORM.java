@@ -8,7 +8,7 @@ import share.model.Dragon;
 import share.model.DragonCharacter;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity(name="dragons")
 @Table(name="dragons", uniqueConstraints={@UniqueConstraint(columnNames={"id"})})
@@ -24,7 +24,7 @@ public class DragonORM implements Serializable {
     this.age = dragon.getAge();
     this.description = dragon.getDescription();
     this.color = dragon.getColor();
-    this.character = dragon.getCharacter();
+    this.temper = dragon.getTemper();
     this.caveDepth = dragon.getCave().getDepth();
     this.caveTreasures = dragon.getCave().getTreasures();
   }
@@ -37,7 +37,7 @@ public class DragonORM implements Serializable {
     this.age = dragon.getAge();
     this.description = dragon.getDescription();
     this.color = dragon.getColor();
-    this.character = dragon.getCharacter();
+    this.temper = dragon.getTemper();
     this.caveDepth = dragon.getCave().getDepth();
     this.caveTreasures = dragon.getCave().getTreasures();
   }
@@ -59,7 +59,7 @@ public class DragonORM implements Serializable {
   private float y; //Значение поля должно быть больше -948
 
   @Column(name="creation_date", nullable=false)
-  private Date creationDate; // Поле не может быть null, Значение этого поля должно генерироваться автоматически
+  private LocalDate creationDate; // Поле не может быть null, Значение этого поля должно генерироваться автоматически
 
   @Min(value = 1, message = "Возраст должен быть больше нуля.")
   @Column(name="age", nullable=false)
@@ -69,10 +69,12 @@ public class DragonORM implements Serializable {
   private String description; // Поле не может быть null
 
   @Column(name="color", nullable=false)
+  @Enumerated(EnumType.STRING)
   private Color color; // Поле не может быть null
 
-  @Column(name="character", nullable=false)
-  private DragonCharacter character; // Поле не может быть null
+  @Column(name="temper", nullable=false)
+  @Enumerated(EnumType.STRING)
+  private DragonCharacter temper; // Поле не может быть null
 
   @Column(name="cave_depth", nullable=false)
   private int caveDepth; // Поле не может быть null
@@ -116,11 +118,11 @@ public class DragonORM implements Serializable {
     this.y = y;
   }
 
-  public Date getCreationDate() {
+  public LocalDate getCreationDate() {
     return creationDate;
   }
 
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
 
@@ -136,9 +138,9 @@ public class DragonORM implements Serializable {
 
   public void setColor(Color color) { this.color = color; }
 
-  public DragonCharacter getCharacter() { return character; }
+  public DragonCharacter getTemper() { return temper; }
 
-  public void setCharacter(DragonCharacter character) { this.character = character; }
+  public void setTemper(DragonCharacter temper) { this.temper = temper; }
 
   public int getCaveDepth() { return caveDepth; }
 

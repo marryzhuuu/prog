@@ -4,6 +4,7 @@ import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
+import share.exceptions.AuthentificationException;
 import share.exceptions.NotFoundException;
 import share.network.requests.RemoveRequest;
 import share.network.responses.RemoveResponse;
@@ -51,6 +52,8 @@ public class Remove extends Command {
             console.printError("Элемент не найден");
         } catch (NumberFormatException e) {
             console.printError("ID элемента должен быть целым числом");
+        } catch (AuthentificationException e) {
+            console.printError(e.getMessage());
         }
         return false;
     }

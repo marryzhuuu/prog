@@ -26,7 +26,7 @@ public class AddIfMax extends Command {
     public Response apply(Request request) {
         var req = (AddIfMaxRequest) request;
         try {
-            return new AddIfMaxResponse(collection.addIfMax(req.dragon), null);
+            return new AddIfMaxResponse(collection.addIfMax(req.getUser(), req.dragon), null);
         } catch (Exception e) {
             return new AddIfMaxResponse(null, e.toString());
         }

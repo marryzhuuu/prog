@@ -1,4 +1,2 @@
 DROP TABLE IF EXISTS dragons;
 DROP TABLE IF EXISTS users;
-DROP TYPE IF EXISTS dragon_character;
-DROP TYPE IF EXISTS color;

@@ -40,7 +40,7 @@ public class Main {
     public static void main(String[] args) throws IOException, ParseException {
 
         SessionFactoryImpl sessionFactory = (SessionFactoryImpl) buildSessionFactory();
-        var session = sessionFactory.getCurrentSession();
+        sessionFactory.getCurrentSession();
         Runtime.getRuntime().addShutdownHook(new Thread(sessionFactory::close));
         var persistenceManager = new PersistenceManager(sessionFactory);
         var authManager = new AuthManager(sessionFactory, config.get("PEPPER"));
@@ -137,7 +137,7 @@ public class Main {
 
             configuration.addPackage("server.orm");
             configuration.addAnnotatedClass(UserORM.class);
-//            configuration.addAnnotatedClass(DragonORM.class);
+            configuration.addAnnotatedClass(DragonORM.class);
 
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
             logger.info("Hibernate Java Config serviceRegistry created");

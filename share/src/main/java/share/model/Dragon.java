@@ -1,35 +1,25 @@
 package share.model;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Dragon implements Serializable, Comparable<Dragon> {
-    private static int nextId=1;
-
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
-    private final java.util.Date creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    private final LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     private Integer age; //Значение поля должно быть больше 0, Поле не может быть null
     private String description; //Поле не может быть null
     private Color color; //Поле не может быть null
     private DragonCharacter character; //Поле не может быть null
     private DragonCave cave; //Поле не может быть null
+    private int creatorId;
 
-    public Dragon(String name, Coordinates coordinates, Integer age, String description, Color color, DragonCharacter character, DragonCave cave) {
-        this.id = nextId++;
-        this.name = name;
-        this.coordinates = coordinates;
-        this.age = age;
-        this.description = description;
-        this.color = color;
-        this.character = character;
-        this.cave = cave;
-        this.creationDate = new Date();
+    public Dragon(int id, String name, Coordinates coordinates, Integer age, String description, Color color, DragonCharacter character, DragonCave cave, LocalDate creationDate) {
+        this(id, name, coordinates, age, description, color, character, cave, creationDate, 0);
     }
 
-    public Dragon(int id, String name, Coordinates coordinates, Date date, Integer age, String description, Color color, DragonCharacter character, DragonCave cave) {
+    public Dragon(int id, String name, Coordinates coordinates, Integer age, String description, Color color, DragonCharacter character, DragonCave cave, LocalDate creationDate, int creatorId) {
         this.id = id;
-        nextId = Math.max(nextId, id+1);
         this.name = name;
         this.coordinates = coordinates;
         this.age = age;
@@ -37,18 +27,26 @@ public class Dragon implements Serializable, Comparable<Dragon> {
         this.color = color;
         this.character = character;
         this.cave = cave;
-        this.creationDate = date;
+        this.creationDate = creationDate;
+        this.creatorId = creatorId;
     }
 
+    public Dragon copy(int id) {
+        return new Dragon(id, this.name, this.coordinates, this.age,
+                this.description, this.color, this.character, this.cave, this.creationDate
+        );
+    }
+
+    public Dragon copy(int id, int creatorId) {
+        return new Dragon(id, this.name, this.coordinates, this.age,
+                this.description, this.color, this.character, this.cave, this.creationDate, this.creatorId
+        );
+    }
     public int getId() {
         return id;
     }
 
     public void setId(int id) { this.id = id;}
-
-    public static int nextId() {
-        return Dragon.nextId++;
-    }
 
     public String getName() {
         return name;
@@ -58,7 +56,7 @@ public class Dragon implements Serializable, Comparable<Dragon> {
         return coordinates;
     }
 
-    public java.util.Date getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
@@ -74,7 +72,7 @@ public class Dragon implements Serializable, Comparable<Dragon> {
         return color;
     }
 
-    public DragonCharacter getCharacter() {
+    public DragonCharacter getTemper() {
         return character;
     }
 

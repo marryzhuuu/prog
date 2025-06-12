@@ -1,9 +1,11 @@
 package share.model;
 
-public enum DragonCharacter {
+import java.io.Serializable;
+
+public enum DragonCharacter implements Serializable {
     CUNNING,
     EVIL,
     GOOD,
     CHAOTIC_EVIL,
-    FICKLE;
+    FICKLE
 }

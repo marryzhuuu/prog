@@ -6,6 +6,7 @@ import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
 import share.exceptions.APIException;
+import share.exceptions.AuthentificationException;
 import share.network.requests.AddRequest;
 import share.network.responses.AddResponse;
 
@@ -48,7 +49,7 @@ public class Add extends Command {
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");
-        } catch (APIException e) {
+        } catch (APIException | AuthentificationException e) {
             console.printError(e.getMessage());
         }
         return false;

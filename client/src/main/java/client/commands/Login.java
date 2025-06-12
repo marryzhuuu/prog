@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.builders.LoginBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
@@ -42,6 +43,7 @@ public class Login extends Command {
             if (response.getError() != null && !response.getError().isEmpty()) {
                 throw new APIException(response.getError());
             }
+            SessionHandler.setCurrentUser(response.user);
             console.println("Пользователь " + response.user.getName() + " успешно аутентифицирован");
             return true;
         } catch(IOException e) {

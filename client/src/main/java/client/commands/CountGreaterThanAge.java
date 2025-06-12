@@ -4,6 +4,7 @@ import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
+import share.exceptions.AuthentificationException;
 import share.network.requests.CountGreaterThanAgeRequest;
 import share.network.responses.CountGreaterThanAgeResponse;
 
@@ -46,6 +47,8 @@ public class CountGreaterThanAge extends Command {
             console.printError("Ошибка взаимодействия с сервером");
         } catch (NumberFormatException e) {
             console.printError("возраст должен быть целым числом");
+        } catch (AuthentificationException e) {
+            console.printError(e.getMessage());
         }
         return false;
     }
