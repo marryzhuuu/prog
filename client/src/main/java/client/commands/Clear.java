@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -33,7 +34,7 @@ public class Clear extends Command {
         }
 
         try {
-            client.sendAndReceiveCommand(new ClearRequest());
+            client.sendAndReceiveCommand(new ClearRequest(SessionHandler.getCurrentUser()));
             console.println("Коллекция очищена");
             return true;
         } catch(IOException e) {

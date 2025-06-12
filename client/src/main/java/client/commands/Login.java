@@ -1,25 +1,24 @@
 package client.commands;
 
-import client.auth.SessionHandler;
-import client.builders.DragonBuilder;
+import client.builders.LoginBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
 import share.exceptions.APIException;
-import share.network.requests.AddIfMaxRequest;
-import share.network.responses.AddIfMaxResponse;
+import share.network.requests.LoginRequest;
+import share.network.responses.LoginResponse;
 
 import java.io.IOException;
 
 /**
- * Команда 'add_if_max'. Добавляет элемент, если он больше максимального по возрасту.
+ * Команда 'login'. Аутентифицирует пользователя.
  */
-public class AddIfMax extends Command {
+public class Login extends Command {
     private final ConsoleView console;
     private final UDPClient client;
 
-    public AddIfMax(ConsoleView console, UDPClient client) {
-        super(CommandType.ADD_IF_MAX + " {element}", "добавить элемент, если он больше максимального по возрасту");
+    public Login(ConsoleView console, UDPClient client) {
+        super(CommandType.LOGIN + " {user}", "войти в аккаунт");
         this.console = console;
         this.client = client;
     }
@@ -37,18 +36,13 @@ public class AddIfMax extends Command {
         }
 
         try {
-            console.println("* Создание нового дракона:");
-
-            var newDragon = new DragonBuilder(console).build();
-            var response = (AddIfMaxResponse) client.sendAndReceiveCommand(new AddIfMaxRequest(newDragon, SessionHandler.getCurrentUser()));
+            console.println("* Вход в аккаунт:");
+            var user = new LoginBuilder(console).build();
+            var response = (LoginResponse) client.sendAndReceiveCommand(new LoginRequest(user));
             if (response.getError() != null && !response.getError().isEmpty()) {
                 throw new APIException(response.getError());
             }
-            if (response.dragon != null) {
-                console.println("Добавлен дракон:\n" + response.dragon);
-            } else {
-                console.println("В коллекции есть драконы не младше");
-            }
+            console.println("Пользователь " + response.user.getName() + " успешно аутентифицирован");
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");

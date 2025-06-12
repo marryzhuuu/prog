@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -37,7 +38,7 @@ public class FilterLessThanCharacter extends Command {
         try {
             String characterString = arguments[1].split(" ")[0];
             DragonCharacter character = DragonCharacter.valueOf(characterString.toUpperCase());
-            var response = (FilterLessThanCharacterResponse) client.sendAndReceiveCommand(new FilterLessThanCharacterRequest(character));
+            var response = (FilterLessThanCharacterResponse) client.sendAndReceiveCommand(new FilterLessThanCharacterRequest(character, SessionHandler.getCurrentUser()));
             for (var dragon : response.dragons) {
                 console.println(dragon + "\n");
             }

@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.builders.DragonBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
@@ -39,7 +40,7 @@ public class Add extends Command {
             console.println("* Создание нового дракона:");
 
             var newDragon = new DragonBuilder(console).build();
-            var response = (AddResponse) client.sendAndReceiveCommand(new AddRequest(newDragon));
+            var response = (AddResponse) client.sendAndReceiveCommand(new AddRequest(newDragon, SessionHandler.getCurrentUser()));
             if (response.getError() != null && !response.getError().isEmpty()) {
                 throw new APIException(response.getError());
             }

@@ -8,7 +8,7 @@ public class RegisterRequest extends Request {
     public final User user;
 
     public RegisterRequest(User user) {
-        super(CommandType.REGISTER);
+        super(CommandType.REGISTER, user);
         this.user = user;
     }
 

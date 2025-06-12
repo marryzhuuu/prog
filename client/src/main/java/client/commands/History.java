@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -34,7 +35,7 @@ public class History extends Command {
         }
 
         try {
-            var response = (HistoryResponse) client.sendAndReceiveCommand(new HistoryRequest());
+            var response = (HistoryResponse) client.sendAndReceiveCommand(new HistoryRequest(SessionHandler.getCurrentUser()));
             console.println(response.historyMessage);
             return true;
         } catch(IOException e) {

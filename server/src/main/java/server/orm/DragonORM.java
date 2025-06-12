@@ -10,7 +10,7 @@ import share.model.DragonCharacter;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
+@Entity(name="dragons")
 @Table(name="dragons", uniqueConstraints={@UniqueConstraint(columnNames={"id"})})
 public class DragonORM implements Serializable {
   public DragonORM() {

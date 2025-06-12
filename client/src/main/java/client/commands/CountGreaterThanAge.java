@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -36,7 +37,7 @@ public class CountGreaterThanAge extends Command {
         try {
             int age = Integer.parseInt(arguments[1].split(" ")[0]);
 
-            var response = (CountGreaterThanAgeResponse) client.sendAndReceiveCommand(new CountGreaterThanAgeRequest(age));
+            var response = (CountGreaterThanAgeResponse) client.sendAndReceiveCommand(new CountGreaterThanAgeRequest(age, SessionHandler.getCurrentUser()));
 
             console.println("Количество элементов старше " + age + response.count);
 

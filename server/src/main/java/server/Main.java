@@ -13,6 +13,7 @@ import server.managers.CommandManager;
 import server.commands.*;
 import server.managers.PersistenceManager;
 import server.network.UDPDatagramServer;
+import server.orm.DragonORM;
 import server.orm.UserORM;
 import share.commands.CommandType;
 
@@ -59,6 +60,7 @@ public class Main {
 
         var commandManager = new CommandManager() {{
             addCommand(CommandType.REGISTER, new Register(authManager));
+            addCommand(CommandType.LOGIN, new Login(authManager));
             addCommand(CommandType.INFO, new Info(dragonCollection));
             addCommand(CommandType.SHOW, new Show(dragonCollection));
             addCommand(CommandType.ADD, new Add(dragonCollection));

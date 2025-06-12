@@ -1,17 +1,29 @@
 package share.network.requests;
 
+import share.model.User;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public abstract class Request implements Serializable {
     private final String name;
+    private final User user;
 
-    public Request(String name) {
+    public Request(String name, User user) {
         this.name = name;
+        this.user = user;
     }
 
     public String getName() {
         return name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public boolean isAuth() {
+        return false;
     }
 
     @Override

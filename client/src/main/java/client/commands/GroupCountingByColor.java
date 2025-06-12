@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -34,7 +35,7 @@ public class GroupCountingByColor extends Command {
         }
 
         try {
-            var response = (GroupCountingByColorResponse) client.sendAndReceiveCommand(new GroupCountingByColorRequest());
+            var response = (GroupCountingByColorResponse) client.sendAndReceiveCommand(new GroupCountingByColorRequest(SessionHandler.getCurrentUser()));
             console.println(response.message);
             return true;
         } catch(IOException e) {

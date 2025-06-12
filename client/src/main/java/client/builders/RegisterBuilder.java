@@ -3,10 +3,10 @@ package client.builders;
 import client.view.ConsoleView;
 import share.model.User;
 
-public class UserBuilder extends Builder<User> {
+public class RegisterBuilder extends Builder<User> {
     private final ConsoleView console;
 
-    public UserBuilder(ConsoleView console) {
+    public RegisterBuilder(ConsoleView console) {
         this.console = console;
     }
 

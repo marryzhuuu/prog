@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.builders.DragonBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
@@ -39,7 +40,7 @@ public class RemoveGreater extends Command {
             console.println("* Ввод данных дракона:");
 
             var newDragon = new DragonBuilder(console).build();
-            var response = (RemoveGreaterResponse) client.sendAndReceiveCommand(new RemoveGreaterRequest(newDragon));
+            var response = (RemoveGreaterResponse) client.sendAndReceiveCommand(new RemoveGreaterRequest(newDragon, SessionHandler.getCurrentUser()));
             if (response.getError() != null && !response.getError().isEmpty()) {
                 throw new APIException(response.getError());
             }

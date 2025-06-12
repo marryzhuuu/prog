@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -33,7 +34,7 @@ public class Save extends Command {
         }
 
         try {
-            client.sendAndReceiveCommand(new SaveRequest());
+            client.sendAndReceiveCommand(new SaveRequest(SessionHandler.getCurrentUser()));
             console.println("Коллекция сохранена");
             return true;
         } catch(IOException e) {

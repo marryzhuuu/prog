@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import server.Main;
 import server.orm.UserORM;
+import share.exceptions.WrongPasswordException;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -45,7 +46,7 @@ public class AuthManager {
     return newId;
   }
 
-  public int loginUser(String login, String password) throws SQLException {
+  public int loginUser(String login, String password) throws SQLException, WrongPasswordException {
     logger.info("Аутентификация пользователя " + login);
     var session = sessionFactory.getCurrentSession();
     session.beginTransaction();
@@ -56,7 +57,7 @@ public class AuthManager {
     List<UserORM> result = (List<UserORM>) query.list();
 
     if (result.isEmpty()) {
-      logger.warn("Неправильный пароль для пользователя " + login);
+      logger.warn("Пользователь " + login + " не существует.");
       return 0;
     }
 
@@ -78,7 +79,7 @@ public class AuthManager {
       "Неправильный пароль для пользователя " + login +
         ". Ожидалось '" + expectedHashedPassword + "', получено '" + actualHashedPassword + "'"
     );
-    return 0;
+    throw new WrongPasswordException("Неправильный пароль пользователя");
   }
 
   private String generateSalt() {

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name="users")
 @Table(name="users", uniqueConstraints={@UniqueConstraint(columnNames={"id"})})
 public class UserORM implements Serializable {
     public UserORM() {

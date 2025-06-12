@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -38,7 +39,7 @@ public class Remove extends Command {
             int id = Integer.parseInt(arguments[1].split(" ")[0]);
 
             // Запрос удалить дракона:
-            var response = (RemoveResponse) client.sendAndReceiveCommand(new RemoveRequest(id));
+            var response = (RemoveResponse) client.sendAndReceiveCommand(new RemoveRequest(id, SessionHandler.getCurrentUser()));
             if (Boolean.parseBoolean(response.getError())) {
                 throw new NotFoundException();
             }

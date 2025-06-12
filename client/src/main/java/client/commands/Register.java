@@ -1,20 +1,17 @@
 package client.commands;
 
-import client.builders.DragonBuilder;
-import client.builders.UserBuilder;
+import client.builders.RegisterBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
 import share.exceptions.APIException;
-import share.network.requests.AddRequest;
 import share.network.requests.RegisterRequest;
-import share.network.responses.AddResponse;
 import share.network.responses.RegisterResponse;
 
 import java.io.IOException;
 
 /**
- * Команда 'register'. Добавляет элемент в коллекцию.
+ * Команда 'register'. Добавляет пользователя.
  */
 public class Register extends Command {
     private final ConsoleView console;
@@ -41,7 +38,7 @@ public class Register extends Command {
         try {
             console.println("* Регистрация пользователя:");
 
-            var user = new UserBuilder(console).build();
+            var user = new RegisterBuilder(console).build();
             var response = (RegisterResponse) client.sendAndReceiveCommand(new RegisterRequest(user));
             if (response.getError() != null && !response.getError().isEmpty()) {
                 throw new APIException(response.getError());

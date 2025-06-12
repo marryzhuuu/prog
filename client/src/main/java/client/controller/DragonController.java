@@ -22,6 +22,7 @@ public class DragonController {
         this.consoleView = console;
         this.commands = new HashMap<>() {{
             put(CommandType.REGISTER, new Register(console, client));
+            put(CommandType.LOGIN, new Login(console, client));
             put(CommandType.HELP, new Help(console, this));
             put(CommandType.INFO, new Info(console, client));
             put(CommandType.SHOW, new Show(console, client));

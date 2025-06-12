@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -34,7 +35,7 @@ public class Show extends Command {
         }
 
         try {
-            var response = (ShowResponse) client.sendAndReceiveCommand(new ShowRequest());
+            var response = (ShowResponse) client.sendAndReceiveCommand(new ShowRequest(SessionHandler.getCurrentUser()));
             for (var dragon : response.dragons) {
                 console.println(dragon + "\n");
             }

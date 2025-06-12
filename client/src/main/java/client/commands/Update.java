@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.builders.DragonBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
@@ -43,7 +44,7 @@ public class Update extends Command {
             int id = Integer.parseInt(arguments[1].split(" ")[0]);
 
             // Получить дракона из коллекции:
-            var getResponse = (GetByIdResponse) client.sendAndReceiveCommand(new GetByIdRequest(id));
+            var getResponse = (GetByIdResponse) client.sendAndReceiveCommand(new GetByIdRequest(id, SessionHandler.getCurrentUser()));
             Dragon dragon = getResponse.dragon;
             if (dragon == null) {
                 throw new NotFoundException();
@@ -51,7 +52,7 @@ public class Update extends Command {
             // Получить данные для обновления:
             Dragon updatedDragon = new DragonBuilder(console).update(dragon);
             // Запрос обновить дракона:
-            var updateResponse = (UpdateResponse) client.sendAndReceiveCommand(new UpdateRequest(id, updatedDragon));
+            var updateResponse = (UpdateResponse) client.sendAndReceiveCommand(new UpdateRequest(id, updatedDragon, SessionHandler.getCurrentUser()));
             dragon = updateResponse.dragon;
             console.println("\nОбновленный дракон:\n" + dragon);
             console.println("Дракон успешно обновлен");

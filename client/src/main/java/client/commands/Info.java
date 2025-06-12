@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
@@ -34,7 +35,7 @@ public class Info extends Command {
         }
 
         try {
-            var response = (InfoResponse) client.sendAndReceiveCommand(new InfoRequest());
+            var response = (InfoResponse) client.sendAndReceiveCommand(new InfoRequest(SessionHandler.getCurrentUser()));
             console.println(response.infoMessage);
             return true;
         } catch(IOException e) {
