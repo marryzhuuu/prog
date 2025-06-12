@@ -124,5 +124,22 @@ public class PersistenceManager {
 
 
 
-  //  ToDo: методы работы с БД
+  public void update(User user, Dragon dragon) {
+    logger.info("Обновление дракона id: " + dragon.getId() + " в БД...");
+    try (var session = sessionFactory.getCurrentSession()) {
+      var transaction = session.beginTransaction();
+      try {
+        var dragonORM = session.get(DragonORM.class, dragon.getId());
+        dragonORM.update(dragon);
+        session.update(dragonORM);
+        transaction.commit();
+        logger.info("Обновление дракона выполнено.");
+      } catch (Exception e) {
+        if (transaction != null && transaction.isActive()) {
+          transaction.rollback();
+        }
+        throw e;
+      }
+    }
+  }
 }

@@ -86,7 +86,15 @@ public class DragonCollection {
 
     public Dragon updateDragon(User user, int id, Dragon updated) {
         Dragon dragon = findDragonById(user, id);
-        return dragon.updateFields(updated);
+
+        updated.setId(id);
+        persistenceManager.update(user, updated);
+
+        lock.lock();
+        dragon.updateFields(updated);
+        lock.unlock();
+
+        return dragon;
     }
 
     public void removeDragon(User user, int id) {

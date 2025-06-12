@@ -27,7 +27,7 @@ public class Update extends Command {
     public Response apply(Request request) {
         var req = (UpdateRequest) request;
         try {
-            Dragon updatedDragon = collection.updateDragon(req.id, req.dragon);
+            Dragon updatedDragon = collection.updateDragon(req.getUser(), req.id, req.dragon);
             return new UpdateResponse(updatedDragon, null);
         } catch (Exception e) {
             return new UpdateResponse(null, e.toString());
