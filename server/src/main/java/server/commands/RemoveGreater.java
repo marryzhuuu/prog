@@ -27,8 +27,8 @@ public class RemoveGreater extends Command {
     public Response apply(Request request) {
         var req = (RemoveGreaterRequest) request;
         try {
-            int size = collection.size();
-            return new RemoveGreaterResponse(size - collection.removeGreater(req.dragon), null);
+            int size = collection.getDragons(req.getUser()).size();
+            return new RemoveGreaterResponse(size - collection.removeGreater(req.getUser(), req.dragon), null);
         } catch (Exception e) {
             return new AddIfMaxResponse(null, e.toString());
         }

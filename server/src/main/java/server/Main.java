@@ -68,7 +68,6 @@ public class Main {
             addCommand(CommandType.UPDATE, new Update(dragonCollection));
             addCommand(CommandType.REMOVE_BY_ID, new Remove(dragonCollection));
             addCommand(CommandType.CLEAR, new Clear(dragonCollection));
-            addCommand(CommandType.SAVE, new Save(dragonCollection));
             addCommand(CommandType.ADD_IF_MAX, new AddIfMax(dragonCollection));
             addCommand(CommandType.REMOVE_GREATER, new RemoveGreater(dragonCollection));
             addCommand(CommandType.HISTORY, new History(this));

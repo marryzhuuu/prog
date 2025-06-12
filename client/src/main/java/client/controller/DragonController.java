@@ -30,7 +30,6 @@ public class DragonController {
             put(CommandType.UPDATE, new Update(console, client));
             put(CommandType.REMOVE_BY_ID, new Remove(console, client));
             put(CommandType.CLEAR, new Clear(console, client));
-            put(CommandType.SAVE, new Save(console, client));
             put(CommandType.ADD_IF_MAX, new AddIfMax(console, client));
             put(CommandType.REMOVE_GREATER, new RemoveGreater(console, client));
             put(CommandType.HISTORY, new History(console, client));

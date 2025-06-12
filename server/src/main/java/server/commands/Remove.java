@@ -26,7 +26,7 @@ public class Remove extends Command {
     public Response apply(Request request) {
         var req = (RemoveRequest) request;
         try {
-            collection.removeDragon(req.id);
+            collection.removeDragon(req.getUser(), req.id);
             return new RemoveResponse(null);
         } catch (Exception e) {
             return new RemoveResponse(e.toString());

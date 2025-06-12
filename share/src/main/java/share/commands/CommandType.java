@@ -12,7 +12,6 @@ public interface CommandType {
     String UPDATE = "update";
     String REMOVE_BY_ID = "remove_by_id";
     String CLEAR = "clear";
-    String SAVE = "save";
 
     // Условные команды
     String ADD_IF_MAX = "add_if_max";

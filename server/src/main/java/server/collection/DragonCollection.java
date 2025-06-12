@@ -89,8 +89,11 @@ public class DragonCollection {
         return dragon.updateFields(updated);
     }
 
-    public void removeDragon(int id) {
-        dragons.removeIf(dragon -> dragon.getId() == id);
+    public void removeDragon(User user, int id) {
+        persistenceManager.remove(user, id);
+        lock.lock();
+        dragons.removeIf(dragon -> (dragon.getId() == id && dragon.getCreatorId() == user.getId()));
+        lock.unlock();
     }
 
     public Dragon findDragonById(User user, int id) {
@@ -143,9 +146,10 @@ public class DragonCollection {
         return null;
     }
 
-    public int removeGreater(Dragon dragon) {
+    public int removeGreater(User user, Dragon dragon) {
+        persistenceManager.removeGreater(user, dragon);
         int age = dragon.getAge();
-        dragons.removeIf(d -> d.getAge() > age);
+        dragons.removeIf(d -> (d.getAge() > age && dragon.getCreatorId() == user.getId()));
         return this.size();
     }
 
