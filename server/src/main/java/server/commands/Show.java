@@ -24,7 +24,7 @@ public class Show extends Command {
     @Override
     public Response apply(Request request) {
         try {
-            return new ShowResponse(collection.sorted(), null);
+            return new ShowResponse(collection.sorted(request.getUser()), null);
         } catch (Exception e) {
             return new ShowResponse(null, e.toString());
         }

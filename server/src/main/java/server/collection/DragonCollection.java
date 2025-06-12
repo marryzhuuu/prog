@@ -84,8 +84,8 @@ public class DragonCollection {
         lock.unlock();
     }
 
-    public Dragon updateDragon(int id, Dragon updated) {
-        Dragon dragon = findDragonById(id);
+    public Dragon updateDragon(User user, int id, Dragon updated) {
+        Dragon dragon = findDragonById(user, id);
         return dragon.updateFields(updated);
     }
 
@@ -93,16 +93,21 @@ public class DragonCollection {
         dragons.removeIf(dragon -> dragon.getId() == id);
     }
 
-    public Dragon findDragonById(int id) {
-        return dragons.stream().filter(d -> d.getId() == id).findFirst().orElse(null);
-    }
-
-    public Vector<Dragon> getDragons() {
-        return dragons;
-    }
-
-    public Vector<Dragon> sorted() {
+    public Dragon findDragonById(User user, int id) {
         return dragons.stream()
+                .filter(d -> d.getCreatorId() == user.getId())
+                .filter(d -> d.getId() == id).findFirst().orElse(null);
+    }
+
+    public Vector<Dragon> getDragons(User user) {
+        return dragons.stream()
+                .filter(d -> d.getCreatorId() == user.getId())
+                .collect(Collectors.toCollection(Vector::new));
+    }
+
+    public Vector<Dragon> sorted(User user) {
+        return dragons.stream()
+            .filter(d -> d.getCreatorId() == user.getId())
             .sorted()
             .collect(Collectors.toCollection(Vector::new));
     }
@@ -144,19 +149,22 @@ public class DragonCollection {
         return this.size();
     }
 
-    public Map<Color, Long> groupCountingByColor() {
+    public Map<Color, Long> groupCountingByColor(User user) {
         return dragons.stream()
+                .filter(dragon -> dragon.getCreatorId() == user.getId())
                 .collect(Collectors.groupingBy(Dragon::getColor, Collectors.counting()));
     }
 
-    public long countGreaterThanAge(long minAge) {
+    public long countGreaterThanAge(User user, long minAge) {
         return dragons.stream()
+                .filter(dragon -> dragon.getCreatorId() == user.getId())
                 .filter(dragon -> dragon.getAge() > minAge)
                 .count();
     }
 
-    public List<Dragon> filterLessThanCharacter(DragonCharacter character) {
+    public List<Dragon> filterLessThanCharacter(User user, DragonCharacter character) {
         return dragons.stream()
+                .filter(dragon -> dragon.getCreatorId() == user.getId())
                 .filter(dragon -> dragon.getTemper().compareTo(character) < 0)
                 .collect(Collectors.toList());
     }

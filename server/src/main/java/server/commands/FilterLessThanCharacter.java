@@ -27,7 +27,7 @@ public class FilterLessThanCharacter extends Command {
         var req = (FilterLessThanCharacterRequest) request;
         try {
 
-            return new FilterLessThanCharacterResponse(collection.filterLessThanCharacter(req.character), null);
+            return new FilterLessThanCharacterResponse(collection.filterLessThanCharacter(req.getUser(), req.character), null);
         } catch (Exception e) {
             return new FilterLessThanCharacterResponse(null, e.toString());
         }

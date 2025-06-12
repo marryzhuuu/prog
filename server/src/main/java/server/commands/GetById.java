@@ -26,7 +26,7 @@ public class GetById extends Command {
     public Response apply(Request request) {
         try {
             var req = (GetByIdRequest) request;
-            return new GetByIdResponse(collection.findDragonById(req.id), null);
+            return new GetByIdResponse(collection.findDragonById(req.getUser(), req.id), null);
         } catch (Exception e) {
             return new GetByIdResponse(null, e.toString());
         }

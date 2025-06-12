@@ -27,7 +27,7 @@ public class CountGreaterThanAge extends Command {
     public Response apply(Request request) {
         var req = (CountGreaterThanAgeRequest) request;
         try {
-            return new CountGreaterThanAgeResponse(collection.countGreaterThanAge(req.age), null);
+            return new CountGreaterThanAgeResponse(collection.countGreaterThanAge(req.getUser(), req.age), null);
         } catch (Exception e) {
             return new UpdateResponse(null, e.toString());
         }

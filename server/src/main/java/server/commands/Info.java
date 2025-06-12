@@ -26,7 +26,7 @@ public class Info extends Command {
 
         var message = "Сведения о коллекции:\n" +
                 " Тип: " + collection.getClass().getSimpleName() + "\n" +
-                " Количество элементов: " + collection.size() + "\n" +
+                " Количество элементов: " + collection.getDragons(request.getUser()).size() + "\n" +
                 " Дата последней инициализации: " + collection.getDate();
         return new InfoResponse(message, null);
     }

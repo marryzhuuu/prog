@@ -27,7 +27,7 @@ public class GroupCountingByColor extends Command {
     @Override
     public Response apply(Request request) {
 
-        Map<Color, Long> groupedByColor = collection.groupCountingByColor();
+        Map<Color, Long> groupedByColor = collection.groupCountingByColor(request.getUser());
        var message = "Количество элементов по цвету:\n";
         for (java.util.Map.Entry<Color, Long> entry : groupedByColor.entrySet()) {
             message += entry.getKey() + ": " + entry.getValue() + '\n';
