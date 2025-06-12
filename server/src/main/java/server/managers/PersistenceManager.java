@@ -27,7 +27,6 @@ public class PersistenceManager {
         var all = cq.select(rootEntry);
 
         var result = session.createQuery(all).getResultList();
-        session.getTransaction().commit();
         transaction.commit();
         return result;
       } catch (Exception e) {

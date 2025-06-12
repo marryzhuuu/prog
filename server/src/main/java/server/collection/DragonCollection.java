@@ -4,15 +4,11 @@ import org.apache.logging.log4j.Logger;
 import server.Main;
 import server.managers.PersistenceManager;
 import share.exceptions.EmptyCollectionException;
-import share.model.Color;
-import share.model.Dragon;
-import share.model.DragonCharacter;
-import share.model.User;
+import share.model.*;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -26,13 +22,6 @@ public class DragonCollection {
     private final PersistenceManager persistenceManager;
     private final Logger logger = Main.logger;
     private final ReentrantLock lock = new ReentrantLock();
-
-    public DragonCollection() {
-        dragons = new Vector<>();
-        date = LocalDate.now();
-//        ToDo: проверять
-        persistenceManager = null;
-    }
 
     public DragonCollection(PersistenceManager persistenceManager) throws IOException, ParseException {
         dragons = new Vector<>();
@@ -52,17 +41,27 @@ public class DragonCollection {
      * Загружает коллекцию из базы данных.
      */
     private void load() {
-        logger.info("Загрузка коллекции...");
+        logger.info("Загрузка коллекции из БД...");
 
         lock.lock();
         dragons = new Vector<Dragon>();
-//        var dragonsORM = persistenceManager.loadDragons();
-//        var savedDragons = dragonsORM.stream().map((dao) -> {
-//            ToDo: загрузка из БД ТОЛЬКО СВОИХ ДРАКОНОВ!!!!!!!!!!!
-//            return new DragonCollection().getDragons();
-//        }).toList();
-//        ToDo: добавить в коллекцию
-//        dragons.addAll(savedDragons);
+        var dragonsORM = persistenceManager.loadDragons();
+
+        var savedDragons = dragonsORM.stream().map(d -> new Dragon(
+            d.getId(),
+            d.getName(),
+            new Coordinates(d.getX(), d.getY()),
+            d.getAge(),
+            d.getDescription(),
+            d.getColor(),
+            d.getTemper(),
+            new DragonCave(d.getCaveDepth(), d.getCaveTreasures()),
+            d.getCreationDate(),
+            d.getCreator().getId()
+        )).toList();
+//            ToDo: загрузка из БД ВСЕХ ДРАКОНОВ!!!!!!!!!!!
+//             ToDo: после во всех операциях фильтровать по logined user Id
+        dragons.addAll(savedDragons);
         lock.unlock();
         logger.info("Загрузка завершена.");
     }

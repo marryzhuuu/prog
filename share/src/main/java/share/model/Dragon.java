@@ -39,7 +39,7 @@ public class Dragon implements Serializable, Comparable<Dragon> {
 
     public Dragon copy(int id, int creatorId) {
         return new Dragon(id, this.name, this.coordinates, this.age,
-                this.description, this.color, this.character, this.cave, this.creationDate, this.creatorId
+            this.description, this.color, this.character, this.cave, this.creationDate, creatorId
         );
     }
     public int getId() {
