@@ -5,6 +5,7 @@ import share.network.responses.Response;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationException;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.SerializationUtils;
@@ -17,6 +18,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Абстрактный класс UDP сервера
@@ -24,7 +28,12 @@ import java.net.SocketException;
 abstract class UDPServer {
     private final InetSocketAddress addr;
     private final CommandHandler commandHandler;
-    private Runnable afterHook;
+    // ExecutorService для многопоточного чтения запросов
+    private final ExecutorService readPool = Executors.newCachedThreadPool(new LoggingThreadFactory());
+    // ExecutorService для многопоточной обработки запросов
+    private final ExecutorService processPool = Executors.newFixedThreadPool(10, new LoggingThreadFactory()); // Например, 10 потоков
+    // ExecutorService для многопоточной отправки ответов
+    private final ExecutorService sendPool = Executors.newCachedThreadPool(new LoggingThreadFactory());
 
     private final Logger logger = Main.logger;
 
@@ -40,7 +49,8 @@ abstract class UDPServer {
     }
 
     /**
-     * Получает данные от клиента.
+     * Получает данные с клиента.
+     * Возвращает пару из данных и адреса клиента
      */
     public abstract Pair<Byte[], SocketAddress> receiveData() throws IOException;
 
@@ -54,62 +64,93 @@ abstract class UDPServer {
     public abstract void disconnectFromClient();
     public abstract void close();
 
+    public static class LoggingThreadFactory implements ThreadFactory {
+        private static final Logger logger = LogManager.getLogger(LoggingThreadFactory.class.getName());
+
+        @Override
+        public Thread newThread(Runnable r) {
+            // Создаем новый поток с пользовательским именем
+            Thread thread = new Thread(r) {
+                @Override
+                public void run() {
+                    logger.info("Thread " + getName() + " started.");
+                    try {
+                        super.run();
+                    } finally {
+                        logger.info("Thread " + getName() + " finished.");
+                    }
+                }
+            };
+
+            // Устанавливаем имя потока для удобства логирования
+            thread.setName("CachedThreadPool-" + thread.getId());
+            return thread;
+        }
+    }
+
     public void run() {
         logger.info("Сервер запущен по адресу " + addr);
 
-        while (running) {
-            Pair<Byte[], SocketAddress> dataPair;
-            try {
-                dataPair = receiveData();
-            } catch (Exception e) {
-                logger.error("Ошибка получения данных : " + e.toString(), e);
+        readPool.submit(() -> {
+            while (running) {
+                Pair<Byte[], SocketAddress> dataPair;
+                try {
+                    dataPair = receiveData();
+                } catch (Exception e) {
+                    logger.error("Ошибка получения данных : " + e.toString(), e);
+                    disconnectFromClient();
+                    continue;
+                }
+
+                var dataFromClient = dataPair.getKey();
+                var clientAddr = dataPair.getValue();
+
+                try {
+                    connectToClient(clientAddr);
+                    logger.info("Соединено с " + clientAddr);
+                } catch (Exception e) {
+                    logger.error("Ошибка соединения с клиентом : " + e.toString(), e);
+                }
+
+                Request request;
+                try {
+                    request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
+                    logger.info("Обработка " + request + " из " + clientAddr);
+                } catch (SerializationException e) {
+                    logger.error("Невозможно десериализовать объект запроса.", e);
+                    disconnectFromClient();
+                    continue;
+                }
+
+                processPool.submit(() -> {
+                    Response response = null;
+                    try {
+                        response = commandHandler.handle(request);
+                    } catch (Exception e) {
+                        logger.error("Ошибка выполнения команды : " + e.toString(), e);
+                    }
+                    if (response == null) response = new UnknownCommandResponse(request.getName());
+
+                    var data = SerializationUtils.serialize(response);
+                    logger.info("Ответ: " + response);
+
+                    sendPool.submit(() -> {
+                        try {
+                            sendData(data, clientAddr);
+                            logger.info("Отправлен ответ клиенту " + clientAddr);
+                        } catch (Exception e) {
+                            logger.error("Ошибка ввода-вывода : " + e.toString(), e);
+                        }
+                    });
+                });
+
                 disconnectFromClient();
-                continue;
+                logger.info("Отключение от клиента " + clientAddr);
             }
-
-            var dataFromClient = dataPair.getKey();
-            var clientAddr = dataPair.getValue();
-
-            try {
-                connectToClient(clientAddr);
-                logger.info("Соединено с " + clientAddr);
-            } catch (Exception e) {
-                logger.error("Ошибка соединения с клиентом : " + e.toString(), e);
-            }
-
-            Request request;
-            try {
-                request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
-                logger.info("Обработка " + request + " из " + clientAddr);
-            } catch (SerializationException e) {
-                logger.error("Невозможно десериализовать объект запроса.", e);
-                disconnectFromClient();
-                continue;
-            }
-
-            Response response = null;
-            try {
-                response = commandHandler.handle(request);
-                if (afterHook != null) afterHook.run();
-            } catch (Exception e) {
-                logger.error("Ошибка выполнения команды : " + e.toString(), e);
-            }
-            if (response == null) response = new UnknownCommandResponse(request.getName());
-
-            var data = SerializationUtils.serialize(response);
-            logger.info("Ответ: " + response);
-
-            try {
-                sendData(data, clientAddr);
-                logger.info("Отправлен ответ клиенту " + clientAddr);
-            } catch (Exception e) {
-                logger.error("Ошибка ввода-вывода : " + e.toString(), e);
-            }
-
-            disconnectFromClient();
-            logger.info("Отключение от клиента " + clientAddr);
-        }
-
-        close();
+            readPool.shutdown();
+            processPool.shutdown();
+            sendPool.shutdown();
+            close();
+        });
     }
 }
