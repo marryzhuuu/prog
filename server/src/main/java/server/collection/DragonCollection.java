@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +24,7 @@ public class DragonCollection {
     private final LocalDate date;
     private final PersistenceManager persistenceManager;
     private final Logger logger = Main.logger;
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public DragonCollection(PersistenceManager persistenceManager) throws IOException, ParseException {
         dragons = new Vector<>();
@@ -45,7 +46,7 @@ public class DragonCollection {
     private void load() {
         logger.info("Загрузка коллекции из БД...");
 
-        lock.lock();
+        lock.writeLock().lock();
         dragons = new Vector<Dragon>();
         var dragonsORM = persistenceManager.loadDragons();
 
@@ -62,7 +63,7 @@ public class DragonCollection {
             d.getCreator().getId()
         )).toList();
         dragons.addAll(savedDragons);
-        lock.unlock();
+        lock.writeLock().unlock();
         logger.info("Загрузка завершена.");
     }
 
@@ -74,9 +75,9 @@ public class DragonCollection {
         var newId = persistenceManager.add(user, dragon);
         logger.info("Новый дракон добавлен в БД.");
 
-        lock.lock();
+        lock.writeLock().lock();
         dragons.add(dragon.copy(newId, user.getId()));
-        lock.unlock();
+        lock.writeLock().unlock();
     }
 
     public Dragon updateDragon(User user, int id, Dragon updated) throws NotFoundException, ForbiddenException {
@@ -92,9 +93,9 @@ public class DragonCollection {
         updated.setId(id);
         persistenceManager.update(user, updated);
 
-        lock.lock();
+        lock.writeLock().lock();
         dragon.updateFields(updated);
-        lock.unlock();
+        lock.writeLock().unlock();
 
         return dragon;
     }
@@ -108,9 +109,9 @@ public class DragonCollection {
             throw new ForbiddenException();
         }
         persistenceManager.remove(user, id);
-        lock.lock();
+        lock.writeLock().lock();
         dragons.removeIf(d -> (d.getId() == id && d.getCreatorId() == user.getId()));
-        lock.unlock();
+        lock.writeLock().unlock();
     }
 
     public Dragon findDragonById(User user, int id) {
@@ -137,9 +138,9 @@ public class DragonCollection {
      */
     public void clear(User user) {
         persistenceManager.clear(user);
-        lock.lock();
+        lock.writeLock().lock();
         dragons.removeIf(dragon -> dragon.getCreatorId() == user.getId());
-        lock.unlock();
+        lock.writeLock().unlock();
     }
 
     public Dragon addIfMax(User user, Dragon dragon) throws EmptyCollectionException {
@@ -153,9 +154,9 @@ public class DragonCollection {
             var newId = persistenceManager.add(user, dragon);
             logger.info("Новый дракон добавлен в БД.");
 
-            lock.lock();
+            lock.writeLock().lock();
             dragons.add(dragon.copy(newId, user.getId()));
-            lock.unlock();
+            lock.writeLock().unlock();
             return dragon;
         }
         return null;
