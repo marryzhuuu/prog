@@ -63,6 +63,9 @@ public class PersistenceManager {
     }
   }
 
+  /**
+   * Удаляет из БД только драконов пользователя.
+   */
   public void clear(User user) {
     logger.info("Удаление драконов пользователя id#" + user.getId() + " из БД...");
     try (var session = sessionFactory.getCurrentSession()) {
@@ -83,16 +86,19 @@ public class PersistenceManager {
   }
 
   public void remove(User user, int id) {
-    logger.info("Удаление дракона пользователя id#" + user.getId() + " из БД...");
+    logger.info("Удаление дракона из БД...");
     try (var session = sessionFactory.getCurrentSession()) {
       var transaction = session.beginTransaction();
       try {
-        var query = session.createQuery("DELETE FROM dragons WHERE creator.id = :creator AND id = :id");
-        query.setParameter("creator", user.getId());
+        var query = session.createQuery("DELETE FROM dragons WHERE id = :id");
         query.setParameter("id", id);
+        int result = query.executeUpdate(); // Выполняем запрос
         transaction.commit();
-        logger.info("Удален дракон id: " + id + " .");
-      } catch (Exception e) {
+        if (result > 0) {
+          logger.info("Удален дракон id: " + id + " .");
+        } else {
+          logger.info("Дракон с id: " + id + " не найден.");
+        }      } catch (Exception e) {
         if (transaction != null && transaction.isActive()) {
           transaction.rollback();
         }
@@ -102,13 +108,13 @@ public class PersistenceManager {
   }
 
   public void removeGreater(User user, Dragon dragon) {
-    logger.info("Удаление драконов пользователя id#" + user.getId() + ", превышающих заданный по возрасту из БД...");
+    logger.info("Удаление драконов пользователя " + user.getId() + ", превышающих заданный по возрасту из БД...");
     try (var session = sessionFactory.getCurrentSession()) {
       var transaction = session.beginTransaction();
       try {
-        var query = session.createQuery("DELETE FROM dragons WHERE creator.id = :creator AND age > :age");
-        query.setParameter("creator", user.getId());
+        var query = session.createQuery("DELETE FROM dragons WHERE age > :age AND creator_id = :creatorId ");
         query.setParameter("age", dragon.getAge());
+        query.setParameter("creatorId", user.getId());
         var deletedSize = query.executeUpdate();
         transaction.commit();
         logger.info("Удалено " + deletedSize + " драконов.");

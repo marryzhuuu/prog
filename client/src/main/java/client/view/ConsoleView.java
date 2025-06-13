@@ -1,5 +1,6 @@
 package client.view;
 
+import client.auth.SessionHandler;
 import client.controller.DragonController;
 
 import java.util.*;
@@ -92,7 +93,14 @@ public class ConsoleView {
 
     public Scanner getScanner() { return this.scanner; }
 
-    public void commandPrompt() { System.out.print(commandPrompt); }
+    public String userName() {
+        try { return SessionHandler.getCurrentUser().getName();
+        } catch (Exception e){
+            return "";
+        }
+    }
 
-    public void attributePrompt() { System.out.print(attributePrompt); }
+    public void commandPrompt() { System.out.print(userName() + commandPrompt); }
+
+    public void attributePrompt() { System.out.print(userName() + attributePrompt); }
 }

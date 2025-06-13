@@ -2,6 +2,8 @@ package server.commands;
 
 import server.collection.DragonCollection;
 import share.commands.CommandType;
+import share.exceptions.ForbiddenException;
+import share.exceptions.NotFoundException;
 import share.network.requests.RemoveRequest;
 import share.network.requests.Request;
 import share.network.responses.RemoveResponse;
@@ -28,8 +30,8 @@ public class Remove extends Command {
         try {
             collection.removeDragon(req.getUser(), req.id);
             return new RemoveResponse(null);
-        } catch (Exception e) {
+        } catch (NotFoundException | ForbiddenException e) {
             return new RemoveResponse(e.toString());
         }
-  }
+    }
 }

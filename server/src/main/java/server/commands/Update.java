@@ -2,6 +2,8 @@ package server.commands;
 
 import server.collection.DragonCollection;
 import share.commands.CommandType;
+import share.exceptions.ForbiddenException;
+import share.exceptions.NotFoundException;
 import share.model.Dragon;
 import share.network.requests.Request;
 import share.network.requests.UpdateRequest;
@@ -29,8 +31,11 @@ public class Update extends Command {
         try {
             Dragon updatedDragon = collection.updateDragon(req.getUser(), req.id, req.dragon);
             return new UpdateResponse(updatedDragon, null);
-        } catch (Exception e) {
+        } catch (ForbiddenException | NotFoundException e) {
+            return new UpdateResponse(null, e.getMessage());
+        }
+        catch (Exception e) {
             return new UpdateResponse(null, e.toString());
         }
-  }
+    }
 }

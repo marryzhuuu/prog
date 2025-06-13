@@ -4,6 +4,8 @@ import org.apache.logging.log4j.Logger;
 import server.Main;
 import server.managers.PersistenceManager;
 import share.exceptions.EmptyCollectionException;
+import share.exceptions.ForbiddenException;
+import share.exceptions.NotFoundException;
 import share.model.*;
 
 import java.io.IOException;
@@ -59,8 +61,6 @@ public class DragonCollection {
             d.getCreationDate(),
             d.getCreator().getId()
         )).toList();
-//            ToDo: загрузка из БД ВСЕХ ДРАКОНОВ!!!!!!!!!!!
-//             ToDo: после во всех операциях фильтровать по logined user Id
         dragons.addAll(savedDragons);
         lock.unlock();
         logger.info("Загрузка завершена.");
@@ -68,10 +68,6 @@ public class DragonCollection {
 
     public LocalDate getDate() {
         return this.date;
-    }
-
-    public void addDragon(Dragon dragon) {
-        dragons.add(dragon);
     }
 
     public void addDragon(User user, Dragon dragon) {
@@ -83,8 +79,15 @@ public class DragonCollection {
         lock.unlock();
     }
 
-    public Dragon updateDragon(User user, int id, Dragon updated) {
+    public Dragon updateDragon(User user, int id, Dragon updated) throws NotFoundException, ForbiddenException {
         Dragon dragon = findDragonById(user, id);
+        if (dragon == null) {
+            throw new NotFoundException();
+        }
+
+        if (user.getId() != dragon.getCreatorId()) {
+            throw new ForbiddenException();
+        }
 
         updated.setId(id);
         persistenceManager.update(user, updated);
@@ -96,28 +99,31 @@ public class DragonCollection {
         return dragon;
     }
 
-    public void removeDragon(User user, int id) {
+    public void removeDragon(User user, int id) throws NotFoundException, ForbiddenException {
+        Dragon dragon = findDragonById(user, id);
+        if (dragon == null) {
+            throw new NotFoundException();
+        }
+        if (user.getId() != dragon.getCreatorId()) {
+            throw new ForbiddenException();
+        }
         persistenceManager.remove(user, id);
         lock.lock();
-        dragons.removeIf(dragon -> (dragon.getId() == id && dragon.getCreatorId() == user.getId()));
+        dragons.removeIf(d -> (d.getId() == id && d.getCreatorId() == user.getId()));
         lock.unlock();
     }
 
     public Dragon findDragonById(User user, int id) {
         return dragons.stream()
-                .filter(d -> d.getCreatorId() == user.getId())
                 .filter(d -> d.getId() == id).findFirst().orElse(null);
     }
 
     public Vector<Dragon> getDragons(User user) {
-        return dragons.stream()
-                .filter(d -> d.getCreatorId() == user.getId())
-                .collect(Collectors.toCollection(Vector::new));
+        return dragons;
     }
 
     public Vector<Dragon> sorted(User user) {
         return dragons.stream()
-            .filter(d -> d.getCreatorId() == user.getId())
             .sorted()
             .collect(Collectors.toCollection(Vector::new));
     }
@@ -126,6 +132,9 @@ public class DragonCollection {
         return this.dragons.size();
     }
 
+    /**
+     * Удаляет только драконов пользователя.
+     */
     public void clear(User user) {
         persistenceManager.clear(user);
         lock.lock();
@@ -136,9 +145,8 @@ public class DragonCollection {
     public Dragon addIfMax(User user, Dragon dragon) throws EmptyCollectionException {
         Dragon oldestDragon = null;
         if(!dragons.isEmpty()) {
-            // Фильтруем драконов по creationId пользователя и находим максимальный возраст
+            // находим максимальный возраст
             oldestDragon = dragons.stream()
-                    .filter(d -> d.getCreatorId() == user.getId())
                     .max(Comparator.comparingInt(Dragon::getAge))
                     .orElse(null);        }
         if(oldestDragon==null || dragon.getAge() > oldestDragon.getAge()) {
@@ -153,6 +161,9 @@ public class DragonCollection {
         return null;
     }
 
+    /**
+     * Удаляет только драконов пользователя, старше чем у дракона.
+     */
     public int removeGreater(User user, Dragon dragon) {
         persistenceManager.removeGreater(user, dragon);
         int age = dragon.getAge();
@@ -162,25 +173,18 @@ public class DragonCollection {
 
     public Map<Color, Long> groupCountingByColor(User user) {
         return dragons.stream()
-                .filter(dragon -> dragon.getCreatorId() == user.getId())
                 .collect(Collectors.groupingBy(Dragon::getColor, Collectors.counting()));
     }
 
     public long countGreaterThanAge(User user, long minAge) {
         return dragons.stream()
-                .filter(dragon -> dragon.getCreatorId() == user.getId())
                 .filter(dragon -> dragon.getAge() > minAge)
                 .count();
     }
 
     public List<Dragon> filterLessThanCharacter(User user, DragonCharacter character) {
         return dragons.stream()
-                .filter(dragon -> dragon.getCreatorId() == user.getId())
                 .filter(dragon -> dragon.getTemper().compareTo(character) < 0)
                 .collect(Collectors.toList());
-    }
-
-    public void save() {
-//        ToDo: в БД
     }
 }

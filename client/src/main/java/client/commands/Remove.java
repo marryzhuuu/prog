@@ -4,6 +4,7 @@ import client.auth.SessionHandler;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
+import share.exceptions.APIException;
 import share.exceptions.AuthentificationException;
 import share.exceptions.NotFoundException;
 import share.network.requests.RemoveRequest;
@@ -41,18 +42,16 @@ public class Remove extends Command {
 
             // Запрос удалить дракона:
             var response = (RemoveResponse) client.sendAndReceiveCommand(new RemoveRequest(id, SessionHandler.getCurrentUser()));
-            if (Boolean.parseBoolean(response.getError())) {
-                throw new NotFoundException();
+            if (response.getError() != null && !response.getError().isEmpty()) {
+                throw new APIException(response.getError());
             }
             console.println("Дракон успешно удален");
             return true;
         } catch(IOException e) {
             console.printError("Ошибка взаимодействия с сервером");
-        } catch (NotFoundException e) {
-            console.printError("Элемент не найден");
         } catch (NumberFormatException e) {
             console.printError("ID элемента должен быть целым числом");
-        } catch (AuthentificationException e) {
+        } catch (AuthentificationException | APIException e) {
             console.printError(e.getMessage());
         }
         return false;

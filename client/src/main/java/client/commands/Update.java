@@ -5,6 +5,7 @@ import client.builders.DragonBuilder;
 import client.network.UDPClient;
 import client.view.ConsoleView;
 import share.commands.CommandType;
+import share.exceptions.APIException;
 import share.exceptions.AuthentificationException;
 import share.exceptions.NotFoundException;
 import share.model.Dragon;
@@ -54,6 +55,9 @@ public class Update extends Command {
             Dragon updatedDragon = new DragonBuilder(console).update(dragon);
             // Запрос обновить дракона:
             var updateResponse = (UpdateResponse) client.sendAndReceiveCommand(new UpdateRequest(id, updatedDragon, SessionHandler.getCurrentUser()));
+            if (updateResponse.getError() != null && !updateResponse.getError().isEmpty()) {
+                throw new APIException(updateResponse.getError());
+            }
             dragon = updateResponse.dragon;
             console.println("\nОбновленный дракон:\n" + dragon);
             console.println("Дракон успешно обновлен");
@@ -64,7 +68,7 @@ public class Update extends Command {
             console.printError("Элемент не найден");
         } catch (NumberFormatException e) {
             console.printError("ID элемента должен быть целым числом");
-        } catch (AuthentificationException e) {
+        } catch (AuthentificationException | APIException e) {
             console.printError(e.getMessage());
         }
         return false;
