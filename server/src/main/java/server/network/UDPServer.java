@@ -2,8 +2,6 @@ package server.network;
 
 import share.network.requests.Request;
 import share.network.responses.Response;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.SerializationException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -18,14 +16,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -69,10 +68,6 @@ abstract class UDPServer {
      * Отправляет данные клиенту
      */
     public abstract void sendData(byte[] data, SocketAddress addr) throws IOException;
-
-//    public abstract void connectToClient(SocketAddress addr) throws SocketException;
-//
-//    public abstract void disconnectFromClient() throws IOException;
 
     public abstract void close();
 
@@ -127,6 +122,8 @@ abstract class UDPServer {
         }
     }
 
+    private final Map<SocketAddress, ByteArrayOutputStream> partialData = new ConcurrentHashMap<>();
+
 
     private void handleRead(SelectionKey key) {
         DatagramChannel channel = (DatagramChannel) key.channel();
@@ -136,45 +133,34 @@ abstract class UDPServer {
 
         try {
             clientAddr = channel.receive(buffer);
-            if (clientAddr != null) {
-                buffer.flip();
-                byte[] chunk = new byte[buffer.remaining()];
-                buffer.get(chunk);
+            if (clientAddr == null) return;
 
-                // Проверяем, является ли этот чанк последним (вам нужно определить свой маркер)
-                isLastChunk = (chunk[chunk.length - 1] == 1); // Вам нужно реализовать этот метод
-                byte[] data = chunk;
+            buffer.flip();
+            byte[] chunk = new byte[buffer.remaining()];
+            buffer.get(chunk);
+            isLastChunk = (chunk[chunk.length - 1] == 1);
+            chunk = Arrays.copyOf(chunk, chunk.length - 1);
 
-                if (!isLastChunk) {
-                    // Собираем все чанки в буфер
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    outputStream.write(chunk);
+            // Добавляем чанк к существующим данным клиента
+            ByteArrayOutputStream dataStream = partialData.computeIfAbsent(
+                    clientAddr, k -> new ByteArrayOutputStream()
+            );
+            dataStream.write(chunk);
 
-                    while (!isLastChunk) {
-                        buffer.clear();
-                        clientAddr = channel.receive(buffer);
-                        buffer.flip();
-                        chunk = new byte[buffer.remaining()];
-                        buffer.get(chunk);
-                        isLastChunk = (chunk[chunk.length - 1] == 1);
-                        outputStream.write(chunk);
-                    }
-
-                    data = outputStream.toByteArray();
-                }
-
-                logger.info("Получены данные от " + clientAddr);
-                processRequest(ArrayUtils.toObject(data), clientAddr);
+            // Если это последний чанк — обрабатываем
+            if (isLastChunk) {
+                byte[] fullData = dataStream.toByteArray();
+                partialData.remove(clientAddr);
+                processRequest(fullData, clientAddr);
             }
         } catch (IOException e) {
-            logger.error("Ошибка чтения данных: " + e.toString(), e);
+            logger.error("Ошибка чтения: " + e.getMessage());
         }
     }
 
-    private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
+    private void processRequest(byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
         try {
-//            connectToClient(clientAddr);
-            Request request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
+            Request request = SerializationUtils.deserialize(dataFromClient);
             processPool.submit(() -> {
                 try {
                     Response response = commandHandler.handle(request);
