@@ -21,7 +21,10 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -38,6 +41,9 @@ abstract class UDPServer {
     private final ExecutorService processPool = Executors.newFixedThreadPool(10, new LoggingThreadFactory()); // Например, 10 потоков
     // ExecutorService для многопоточной отправки ответов
     private final ExecutorService sendPool = Executors.newCachedThreadPool(new LoggingThreadFactory());
+
+    protected Selector selector;
+    private final int BUFFER_SIZE = 65507; // Максимальный размер UDP пакета
 
     private final Logger logger = Main.logger;
 
@@ -65,7 +71,7 @@ abstract class UDPServer {
 
     public abstract void connectToClient(SocketAddress addr) throws SocketException;
 
-    public abstract void disconnectFromClient();
+    public abstract void disconnectFromClient() throws IOException;
     public abstract void close();
 
     public static class LoggingThreadFactory implements ThreadFactory {
@@ -93,38 +99,58 @@ abstract class UDPServer {
     }
 
     public void run() {
-        logger.info("Сервер запущен по адресу " + addr);
+        try {
+            logger.info("Сервер запущен по адресу " + addr);
 
-        while (running) {
-            Pair<Byte[], SocketAddress> dataPair;
-            logger.info("1 - ожидание данных");
-            try {
-                dataPair = receiveData();
-            } catch (Exception e) {
-                logger.error("Ошибка получения данных : " + e.toString(), e);
-                disconnectFromClient();
-                continue;
+            while (running) {
+                if (selector.select() > 0) {
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+
+                    while (keyIterator.hasNext()) {
+                        SelectionKey key = keyIterator.next();
+                        if (key.isReadable()) {
+                            readPool.submit(() -> handleRead(key));
+                        }
+                        keyIterator.remove();
+                    }
+                }
             }
-            var dataFromClient = dataPair.getKey();
-            var clientAddr = dataPair.getValue();
-            logger.info("2 - получены данные: " + Arrays.toString(dataFromClient) + clientAddr);
-
-            processRequest(dataFromClient, clientAddr);
+        } catch (IOException e) {
+            logger.error("Ошибка в селекторе: " + e.toString(), e);
+        } finally {
+            processPool.shutdown();
+            sendPool.shutdown();
+            close();
         }
-        readPool.shutdown();
-        processPool.shutdown();
-        sendPool.shutdown();
-        close();
     }
 
-    private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) {
+
+    private void handleRead(SelectionKey key) {
+        DatagramChannel channel = (DatagramChannel) key.channel();
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        SocketAddress clientAddr;
+
+        try {
+            clientAddr = channel.receive(buffer);
+            if (clientAddr != null) {
+                buffer.flip();
+                byte[] data = new byte[buffer.remaining()];
+                buffer.get(data);
+
+                logger.info("Получены данные от " + clientAddr);
+                processRequest(ArrayUtils.toObject(data), clientAddr);
+            }
+        } catch (IOException e) {
+            logger.error("Ошибка чтения данных: " + e.toString(), e);
+        }
+    }
+
+    private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
         try {
             connectToClient(clientAddr);
-            logger.info("3 - установлено соединение с клиентом, десериализация данных из запроса...");
             Request request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
-            logger.info("4 - обработка запроса: " + request + "...");
             processPool.submit(() -> {
-                logger.info("4 - обработка запроса в отдельном потоке: " + request);
                 try {
                     Response response = commandHandler.handle(request);
                     if (response == null) {
@@ -134,13 +160,16 @@ abstract class UDPServer {
                     byte[] data = SerializationUtils.serialize(response);
 
                     sendPool.submit(() -> {
-                    logger.info("5 - отправка ответа в отдельном потоке: " + Arrays.toString(data));
                         try {
                             sendData(data, clientAddr);
                         } catch (Exception e) {
                             logger.error("Ошибка отправки ответа: " + e.toString(), e);
                         } finally {
-                            disconnectFromClient();
+                            try {
+                                disconnectFromClient();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     });
                 } catch (Exception e) {
@@ -152,24 +181,4 @@ abstract class UDPServer {
             disconnectFromClient();
         }
     }
-
-//    private void handleRead(SelectionKey key) {
-//        DatagramChannel channel = (DatagramChannel) key.channel();
-//        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
-//        SocketAddress clientAddr;
-//
-//        try {
-//            clientAddr = channel.receive(buffer);
-//            if (clientAddr != null) {
-//                buffer.flip();
-//                byte[] data = new byte[buffer.remaining()];
-//                buffer.get(data);
-//
-//                logger.info("Получены данные от " + clientAddr);
-//                processRequest(ArrayUtils.toObject(data), clientAddr);
-//            }
-//        } catch (IOException e) {
-//            logger.error("Ошибка чтения данных: " + e.toString(), e);
-//        }
-//    }
 }
