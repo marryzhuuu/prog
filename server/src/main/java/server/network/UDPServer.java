@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -106,55 +109,67 @@ abstract class UDPServer {
             var clientAddr = dataPair.getValue();
             logger.info("2 - получены данные: " + Arrays.toString(dataFromClient) + clientAddr);
 
-            readPool.submit(() -> {
-                logger.info("2 - получены данные в отдельном потоке: "  + Arrays.toString(dataFromClient) + clientAddr);
-                try {
-                    connectToClient(clientAddr);
-                    logger.info("Соединено с " + clientAddr);
-                } catch (Exception e) {
-                    logger.error("Ошибка соединения с клиентом : " + e.toString(), e);
-                }
-                logger.info("3 - установлено соединение с клиентом, десериализация данных из запроса...");
-                Request request;
-                try {
-                    request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
-                    logger.info("Обработка " + request + " из " + clientAddr);
-                } catch (SerializationException e) {
-                    logger.error("Невозможно десериализовать объект запроса.", e);
-                    disconnectFromClient();
-                    return;
-                }
-                logger.info("4 - обработка запроса: " + request + "...");
-                processPool.submit(() -> {
-                    logger.info("4 - обработка запроса в отдельном потоке: " + request);
-                    Response response = null;
-                    try {
-                        response = commandHandler.handle(request);
-                    } catch (Exception e) {
-                        logger.error("Ошибка выполнения команды : " + e.toString(), e);
-                    }
-                    if (response == null) response = new UnknownCommandResponse(request.getName());
-
-                    var data = SerializationUtils.serialize(response);
-                    logger.info("Ответ: " + response);
-
-                    sendPool.submit(() -> {
-                        logger.info("5 - отправка ответа в отдельном потоке: " + Arrays.toString(data));
-                        try {
-                            sendData(data, clientAddr);
-                            logger.info("Отправлен ответ клиенту " + clientAddr);
-                        } catch (Exception e) {
-                            logger.error("Ошибка ввода-вывода : " + e.toString(), e);
-                        }
-                    });
-                    disconnectFromClient();
-                    logger.info("Отключение от клиента " + clientAddr);
-                });
-            });
+            processRequest(dataFromClient, clientAddr);
         }
         readPool.shutdown();
         processPool.shutdown();
         sendPool.shutdown();
         close();
     }
+
+    private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) {
+        try {
+            connectToClient(clientAddr);
+            logger.info("3 - установлено соединение с клиентом, десериализация данных из запроса...");
+            Request request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
+            logger.info("4 - обработка запроса: " + request + "...");
+            processPool.submit(() -> {
+                logger.info("4 - обработка запроса в отдельном потоке: " + request);
+                try {
+                    Response response = commandHandler.handle(request);
+                    if (response == null) {
+                        response = new UnknownCommandResponse(request.getName());
+                    }
+
+                    byte[] data = SerializationUtils.serialize(response);
+
+                    sendPool.submit(() -> {
+                    logger.info("5 - отправка ответа в отдельном потоке: " + Arrays.toString(data));
+                        try {
+                            sendData(data, clientAddr);
+                        } catch (Exception e) {
+                            logger.error("Ошибка отправки ответа: " + e.toString(), e);
+                        } finally {
+                            disconnectFromClient();
+                        }
+                    });
+                } catch (Exception e) {
+                    logger.error("Ошибка обработки запроса: " + e.toString(), e);
+                }
+            });
+        } catch (Exception e) {
+            logger.error("Ошибка обработки запроса: " + e.toString(), e);
+            disconnectFromClient();
+        }
+    }
+
+//    private void handleRead(SelectionKey key) {
+//        DatagramChannel channel = (DatagramChannel) key.channel();
+//        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+//        SocketAddress clientAddr;
+//
+//        try {
+//            clientAddr = channel.receive(buffer);
+//            if (clientAddr != null) {
+//                buffer.flip();
+//                byte[] data = new byte[buffer.remaining()];
+//                buffer.get(data);
+//
+//                logger.info("Получены данные от " + clientAddr);
+//                processRequest(ArrayUtils.toObject(data), clientAddr);
+//            }
+//        } catch (IOException e) {
+//            logger.error("Ошибка чтения данных: " + e.toString(), e);
+//        }
+//    }
 }
