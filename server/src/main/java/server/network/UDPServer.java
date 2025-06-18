@@ -2,8 +2,6 @@ package server.network;
 
 import share.network.requests.Request;
 import share.network.responses.Response;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.SerializationException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -14,17 +12,19 @@ import server.Main;
 import share.network.responses.UnknownCommandResponse;
 import server.commands.CommandHandler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -69,9 +69,6 @@ abstract class UDPServer {
      */
     public abstract void sendData(byte[] data, SocketAddress addr) throws IOException;
 
-    public abstract void connectToClient(SocketAddress addr) throws SocketException;
-
-    public abstract void disconnectFromClient() throws IOException;
     public abstract void close();
 
     public static class LoggingThreadFactory implements ThreadFactory {
@@ -125,31 +122,45 @@ abstract class UDPServer {
         }
     }
 
+    private final Map<SocketAddress, ByteArrayOutputStream> partialData = new ConcurrentHashMap<>();
+
 
     private void handleRead(SelectionKey key) {
         DatagramChannel channel = (DatagramChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         SocketAddress clientAddr;
+        boolean isLastChunk = false;
 
         try {
             clientAddr = channel.receive(buffer);
-            if (clientAddr != null) {
-                buffer.flip();
-                byte[] data = new byte[buffer.remaining()];
-                buffer.get(data);
+            if (clientAddr == null) return;
 
-                logger.info("Получены данные от " + clientAddr);
-                processRequest(ArrayUtils.toObject(data), clientAddr);
+            buffer.flip();
+            byte[] chunk = new byte[buffer.remaining()];
+            buffer.get(chunk);
+            isLastChunk = (chunk[chunk.length - 1] == 1);
+            chunk = Arrays.copyOf(chunk, chunk.length - 1);
+
+            // Добавляем чанк к существующим данным клиента
+            ByteArrayOutputStream dataStream = partialData.computeIfAbsent(
+                    clientAddr, k -> new ByteArrayOutputStream()
+            );
+            dataStream.write(chunk);
+
+            // Если это последний чанк — обрабатываем
+            if (isLastChunk) {
+                byte[] fullData = dataStream.toByteArray();
+                partialData.remove(clientAddr);
+                processRequest(fullData, clientAddr);
             }
         } catch (IOException e) {
-            logger.error("Ошибка чтения данных: " + e.toString(), e);
+            logger.error("Ошибка чтения: " + e.getMessage());
         }
     }
 
-    private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
+    private void processRequest(byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
         try {
-            connectToClient(clientAddr);
-            Request request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
+            Request request = SerializationUtils.deserialize(dataFromClient);
             processPool.submit(() -> {
                 try {
                     Response response = commandHandler.handle(request);
@@ -164,12 +175,6 @@ abstract class UDPServer {
                             sendData(data, clientAddr);
                         } catch (Exception e) {
                             logger.error("Ошибка отправки ответа: " + e.toString(), e);
-                        } finally {
-                            try {
-                                disconnectFromClient();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
                         }
                     });
                 } catch (Exception e) {
@@ -178,7 +183,6 @@ abstract class UDPServer {
             });
         } catch (Exception e) {
             logger.error("Ошибка обработки запроса: " + e.toString(), e);
-            disconnectFromClient();
         }
     }
 }
