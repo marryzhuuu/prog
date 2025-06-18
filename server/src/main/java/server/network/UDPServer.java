@@ -18,6 +18,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -34,6 +41,9 @@ abstract class UDPServer {
     private final ExecutorService processPool = Executors.newFixedThreadPool(10, new LoggingThreadFactory()); // Например, 10 потоков
     // ExecutorService для многопоточной отправки ответов
     private final ExecutorService sendPool = Executors.newCachedThreadPool(new LoggingThreadFactory());
+
+    protected Selector selector;
+    private final int BUFFER_SIZE = 65507; // Максимальный размер UDP пакета
 
     private final Logger logger = Main.logger;
 
@@ -61,7 +71,7 @@ abstract class UDPServer {
 
     public abstract void connectToClient(SocketAddress addr) throws SocketException;
 
-    public abstract void disconnectFromClient();
+    public abstract void disconnectFromClient() throws IOException;
     public abstract void close();
 
     public static class LoggingThreadFactory implements ThreadFactory {
@@ -89,68 +99,86 @@ abstract class UDPServer {
     }
 
     public void run() {
-        logger.info("Сервер запущен по адресу " + addr);
+        try {
+            logger.info("Сервер запущен по адресу " + addr);
 
-        readPool.submit(() -> {
             while (running) {
-                Pair<Byte[], SocketAddress> dataPair;
-                try {
-                    dataPair = receiveData();
-                } catch (Exception e) {
-                    logger.error("Ошибка получения данных : " + e.toString(), e);
-                    disconnectFromClient();
-                    continue;
-                }
+                if (selector.select() > 0) {
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
-                var dataFromClient = dataPair.getKey();
-                var clientAddr = dataPair.getValue();
-
-                try {
-                    connectToClient(clientAddr);
-                    logger.info("Соединено с " + clientAddr);
-                } catch (Exception e) {
-                    logger.error("Ошибка соединения с клиентом : " + e.toString(), e);
-                }
-
-                Request request;
-                try {
-                    request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
-                    logger.info("Обработка " + request + " из " + clientAddr);
-                } catch (SerializationException e) {
-                    logger.error("Невозможно десериализовать объект запроса.", e);
-                    disconnectFromClient();
-                    continue;
-                }
-
-                processPool.submit(() -> {
-                    Response response = null;
-                    try {
-                        response = commandHandler.handle(request);
-                    } catch (Exception e) {
-                        logger.error("Ошибка выполнения команды : " + e.toString(), e);
+                    while (keyIterator.hasNext()) {
+                        SelectionKey key = keyIterator.next();
+                        if (key.isReadable()) {
+                            readPool.submit(() -> handleRead(key));
+                        }
+                        keyIterator.remove();
                     }
-                    if (response == null) response = new UnknownCommandResponse(request.getName());
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Ошибка в селекторе: " + e.toString(), e);
+        } finally {
+            processPool.shutdown();
+            sendPool.shutdown();
+            close();
+        }
+    }
 
-                    var data = SerializationUtils.serialize(response);
-                    logger.info("Ответ: " + response);
+
+    private void handleRead(SelectionKey key) {
+        DatagramChannel channel = (DatagramChannel) key.channel();
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        SocketAddress clientAddr;
+
+        try {
+            clientAddr = channel.receive(buffer);
+            if (clientAddr != null) {
+                buffer.flip();
+                byte[] data = new byte[buffer.remaining()];
+                buffer.get(data);
+
+                logger.info("Получены данные от " + clientAddr);
+                processRequest(ArrayUtils.toObject(data), clientAddr);
+            }
+        } catch (IOException e) {
+            logger.error("Ошибка чтения данных: " + e.toString(), e);
+        }
+    }
+
+    private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
+        try {
+            connectToClient(clientAddr);
+            Request request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
+            processPool.submit(() -> {
+                try {
+                    Response response = commandHandler.handle(request);
+                    if (response == null) {
+                        response = new UnknownCommandResponse(request.getName());
+                    }
+
+                    byte[] data = SerializationUtils.serialize(response);
 
                     sendPool.submit(() -> {
                         try {
                             sendData(data, clientAddr);
-                            logger.info("Отправлен ответ клиенту " + clientAddr);
                         } catch (Exception e) {
-                            logger.error("Ошибка ввода-вывода : " + e.toString(), e);
+                            logger.error("Ошибка отправки ответа: " + e.toString(), e);
+                        } finally {
+                            try {
+                                disconnectFromClient();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     });
-                });
-
-                disconnectFromClient();
-                logger.info("Отключение от клиента " + clientAddr);
-            }
-            readPool.shutdown();
-            processPool.shutdown();
-            sendPool.shutdown();
-            close();
-        });
+                } catch (Exception e) {
+                    logger.error("Ошибка обработки запроса: " + e.toString(), e);
+                }
+            });
+        } catch (Exception e) {
+            logger.error("Ошибка обработки запроса: " + e.toString(), e);
+            disconnectFromClient();
+        }
     }
 }

@@ -1,6 +1,5 @@
 package server.network;
 
-import com.google.common.primitives.Bytes;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -11,87 +10,107 @@ import server.commands.CommandHandler;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 public class UDPDatagramServer extends UDPServer {
-    private final int PACKET_SIZE = 1024;
-    private final int DATA_SIZE = PACKET_SIZE - 1;
-
-    private final DatagramSocket datagramSocket;
-
+    private final DatagramChannel datagramChannel;
+    private final int BUFFER_SIZE = 65507;
     private final Logger logger = Main.logger;
 
-    public UDPDatagramServer(InetAddress address, int port, CommandHandler commandHandler) throws SocketException {
+    public UDPDatagramServer(InetAddress address, int port, CommandHandler commandHandler) throws IOException {
         super(new InetSocketAddress(address, port), commandHandler);
-        this.datagramSocket = new DatagramSocket(getAddr());
-        this.datagramSocket.setReuseAddress(true);
+        this.datagramChannel = DatagramChannel.open();
+        this.datagramChannel.configureBlocking(false);
+        this.datagramChannel.bind(getAddr());
+        this.selector = Selector.open();
+        this.datagramChannel.register(selector, SelectionKey.OP_READ);
     }
 
     @Override
     public Pair<Byte[], SocketAddress> receiveData() throws IOException {
-        var received = false;
-        var result = new byte[0];
-        SocketAddress addr = null;
-
-        while(!received) {
-            var data = new byte[PACKET_SIZE];
-
-            var dp = new DatagramPacket(data, PACKET_SIZE);
-            datagramSocket.receive(dp);
-
-            addr = dp.getSocketAddress();
-            logger.info("Получено " + String.valueOf(data.length) + "байт от " + dp.getAddress());
-
-            if (data[data.length - 1] == 1) {
-                received = true;
-                logger.info("Получение данных от " + dp.getAddress() + " окончено");
-            }
-            result = Bytes.concat(result, Arrays.copyOf(data, data.length - 1));
-        }
-        return new ImmutablePair<>(ArrayUtils.toObject(result), addr);
+        ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        SocketAddress clientAddr = datagramChannel.receive(buffer);
+        buffer.flip();
+        byte[] data = new byte[buffer.remaining()];
+        buffer.get(data);
+        return new ImmutablePair<>(ArrayUtils.toObject(data), clientAddr);
     }
 
-    @Override
-    public void sendData(byte[] data, SocketAddress addr) throws IOException {
-        byte[][] ret = new byte[(int)Math.ceil(data.length / (double)DATA_SIZE)][DATA_SIZE];
 
-        int start = 0;
-        for(int i = 0; i < ret.length; i++) {
-            ret[i] = Arrays.copyOfRange(data, start, start + DATA_SIZE);
-            start += DATA_SIZE;
+@Override
+public void sendData(byte[] data, SocketAddress addr) throws IOException {
+    final int PACKET_SIZE = 1024; // Общий размер пакета
+    final int DATA_SIZE = PACKET_SIZE - 1; // Данные + 1 байт маркера
+
+    ByteBuffer buffer = ByteBuffer.allocate(PACKET_SIZE);
+    int totalSent = 0;
+    int packetsCount = (int) Math.ceil((double) data.length / DATA_SIZE);
+
+    logger.info("Отправляется " + packetsCount + " пакетов...");
+
+    for (int i = 0; i < packetsCount; i++) {
+        buffer.clear();
+
+        // Определяем границы текущего чанка
+        int start = i * DATA_SIZE;
+        int end = Math.min(start + DATA_SIZE, data.length);
+        int chunkSize = end - start;
+
+        // Заполняем буфер данными
+        buffer.put(data, start, chunkSize);
+
+        // Добавляем маркер конца (1 для последнего пакета, 0 для остальных)
+        byte marker = (i == packetsCount - 1) ? (byte)1 : (byte)0;
+        buffer.put(marker);
+
+        // Подготавливаем буфер к отправке
+        buffer.flip();
+
+        // Отправляем пакет
+        while (buffer.hasRemaining()) {
+            datagramChannel.send(buffer, addr);
         }
 
-        logger.info("Отправляется " + ret.length + " чанков...");
-
-        for(int i = 0; i < ret.length; i++) {
-            var chunk = ret[i];
-            if (i == ret.length - 1) {
-                var lastChunk = Bytes.concat(chunk, new byte[]{1});
-                var dp = new DatagramPacket(lastChunk, PACKET_SIZE, addr);
-                datagramSocket.send(dp);
-                logger.info("Последний чанк размером " + chunk.length + " отправлен на сервер.");
-            } else {
-                var dp = new DatagramPacket(ByteBuffer.allocate(PACKET_SIZE).put(chunk).array(), PACKET_SIZE, addr);
-                datagramSocket.send(dp);
-                logger.info("Чанк размером " + chunk.length + " отправлен на сервер.");
-            }
+        if (marker == 1) {
+            logger.info("Последний пакет размером " + (chunkSize + 1) + " байт отправлен");
+        } else {
+            logger.info("Пакет " + (i + 1) + "/" + packetsCount + " размером " + (chunkSize + 1) + " байт отправлен");
         }
 
-        logger.info("Отправка данных завершена");
+        totalSent += chunkSize;
     }
+
+    logger.info("Отправка завершена. Всего отправлено " + totalSent + " байт данных");
+}
+
 
     @Override
     public void connectToClient(SocketAddress addr) throws SocketException {
-        datagramSocket.connect(addr);
+        try {
+            datagramChannel.connect(addr);
+        } catch (IOException e) {
+            throw new SocketException(e.getMessage());
+        }
     }
 
     @Override
-    public void disconnectFromClient() {
-        datagramSocket.disconnect();
+    public void disconnectFromClient() throws IOException {
+        datagramChannel.disconnect();
     }
 
     @Override
     public void close() {
-        datagramSocket.close();
+        try {
+            if (datagramChannel != null && datagramChannel.isOpen()) {
+                datagramChannel.close();
+            }
+            if (selector != null && selector.isOpen()) {
+                selector.close();
+            }
+        } catch (IOException e) {
+            logger.error("Ошибка при закрытии ресурсов", e);
+        }
     }
 }
