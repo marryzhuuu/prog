@@ -85,21 +85,6 @@ public void sendData(byte[] data, SocketAddress addr) throws IOException {
     logger.info("Отправка завершена. Всего отправлено " + totalSent + " байт данных");
 }
 
-
-    @Override
-    public void connectToClient(SocketAddress addr) throws SocketException {
-        try {
-            datagramChannel.connect(addr);
-        } catch (IOException e) {
-            throw new SocketException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void disconnectFromClient() throws IOException {
-        datagramChannel.disconnect();
-    }
-
     @Override
     public void close() {
         try {

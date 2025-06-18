@@ -14,6 +14,7 @@ import server.Main;
 import share.network.responses.UnknownCommandResponse;
 import server.commands.CommandHandler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -69,9 +70,10 @@ abstract class UDPServer {
      */
     public abstract void sendData(byte[] data, SocketAddress addr) throws IOException;
 
-    public abstract void connectToClient(SocketAddress addr) throws SocketException;
+//    public abstract void connectToClient(SocketAddress addr) throws SocketException;
+//
+//    public abstract void disconnectFromClient() throws IOException;
 
-    public abstract void disconnectFromClient() throws IOException;
     public abstract void close();
 
     public static class LoggingThreadFactory implements ThreadFactory {
@@ -130,13 +132,36 @@ abstract class UDPServer {
         DatagramChannel channel = (DatagramChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         SocketAddress clientAddr;
+        boolean isLastChunk = false;
 
         try {
             clientAddr = channel.receive(buffer);
             if (clientAddr != null) {
                 buffer.flip();
-                byte[] data = new byte[buffer.remaining()];
-                buffer.get(data);
+                byte[] chunk = new byte[buffer.remaining()];
+                buffer.get(chunk);
+
+                // Проверяем, является ли этот чанк последним (вам нужно определить свой маркер)
+                isLastChunk = (chunk[chunk.length - 1] == 1); // Вам нужно реализовать этот метод
+                byte[] data = chunk;
+
+                if (!isLastChunk) {
+                    // Собираем все чанки в буфер
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    outputStream.write(chunk);
+
+                    while (!isLastChunk) {
+                        buffer.clear();
+                        clientAddr = channel.receive(buffer);
+                        buffer.flip();
+                        chunk = new byte[buffer.remaining()];
+                        buffer.get(chunk);
+                        isLastChunk = (chunk[chunk.length - 1] == 1);
+                        outputStream.write(chunk);
+                    }
+
+                    data = outputStream.toByteArray();
+                }
 
                 logger.info("Получены данные от " + clientAddr);
                 processRequest(ArrayUtils.toObject(data), clientAddr);
@@ -148,7 +173,7 @@ abstract class UDPServer {
 
     private void processRequest(Byte[] dataFromClient, SocketAddress clientAddr) throws IOException {
         try {
-            connectToClient(clientAddr);
+//            connectToClient(clientAddr);
             Request request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
             processPool.submit(() -> {
                 try {
@@ -164,12 +189,6 @@ abstract class UDPServer {
                             sendData(data, clientAddr);
                         } catch (Exception e) {
                             logger.error("Ошибка отправки ответа: " + e.toString(), e);
-                        } finally {
-                            try {
-                                disconnectFromClient();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
                         }
                     });
                 } catch (Exception e) {
@@ -178,7 +197,6 @@ abstract class UDPServer {
             });
         } catch (Exception e) {
             logger.error("Ошибка обработки запроса: " + e.toString(), e);
-            disconnectFromClient();
         }
     }
 }
