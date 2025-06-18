@@ -82,7 +82,10 @@ public class UDPDatagramServer extends UDPServer {
 
     @Override
     public void connectToClient(SocketAddress addr) throws SocketException {
+        logger.info("? - подключение к клиенту:" + addr);
         datagramSocket.connect(addr);
+        logger.info("? - подключено к клиенту:" + addr);
+
     }
 
     @Override

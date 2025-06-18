@@ -68,7 +68,7 @@ public class AuthManager {
           return 0;
         }
 
-        var user = result.getFirst();
+        var user = result.get(0);
         session.getTransaction().commit();
         session.close();
 

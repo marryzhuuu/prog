@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -91,27 +92,29 @@ abstract class UDPServer {
     public void run() {
         logger.info("Сервер запущен по адресу " + addr);
 
-        readPool.submit(() -> {
-            while (running) {
-                Pair<Byte[], SocketAddress> dataPair;
-                try {
-                    dataPair = receiveData();
-                } catch (Exception e) {
-                    logger.error("Ошибка получения данных : " + e.toString(), e);
-                    disconnectFromClient();
-                    continue;
-                }
+        while (running) {
+            Pair<Byte[], SocketAddress> dataPair;
+            logger.info("1 - ожидание данных");
+            try {
+                dataPair = receiveData();
+            } catch (Exception e) {
+                logger.error("Ошибка получения данных : " + e.toString(), e);
+                disconnectFromClient();
+                continue;
+            }
+            var dataFromClient = dataPair.getKey();
+            var clientAddr = dataPair.getValue();
+            logger.info("2 - получены данные: " + Arrays.toString(dataFromClient) + clientAddr);
 
-                var dataFromClient = dataPair.getKey();
-                var clientAddr = dataPair.getValue();
-
+            readPool.submit(() -> {
+                logger.info("2 - получены данные в отдельном потоке: "  + Arrays.toString(dataFromClient) + clientAddr);
                 try {
                     connectToClient(clientAddr);
                     logger.info("Соединено с " + clientAddr);
                 } catch (Exception e) {
                     logger.error("Ошибка соединения с клиентом : " + e.toString(), e);
                 }
-
+                logger.info("3 - установлено соединение с клиентом, десериализация данных из запроса...");
                 Request request;
                 try {
                     request = SerializationUtils.deserialize(ArrayUtils.toPrimitive(dataFromClient));
@@ -119,10 +122,11 @@ abstract class UDPServer {
                 } catch (SerializationException e) {
                     logger.error("Невозможно десериализовать объект запроса.", e);
                     disconnectFromClient();
-                    continue;
+                    return;
                 }
-
+                logger.info("4 - обработка запроса: " + request + "...");
                 processPool.submit(() -> {
+                    logger.info("4 - обработка запроса в отдельном потоке: " + request);
                     Response response = null;
                     try {
                         response = commandHandler.handle(request);
@@ -135,6 +139,7 @@ abstract class UDPServer {
                     logger.info("Ответ: " + response);
 
                     sendPool.submit(() -> {
+                        logger.info("5 - отправка ответа в отдельном потоке: " + Arrays.toString(data));
                         try {
                             sendData(data, clientAddr);
                             logger.info("Отправлен ответ клиенту " + clientAddr);
@@ -142,15 +147,14 @@ abstract class UDPServer {
                             logger.error("Ошибка ввода-вывода : " + e.toString(), e);
                         }
                     });
+                    disconnectFromClient();
+                    logger.info("Отключение от клиента " + clientAddr);
                 });
-
-                disconnectFromClient();
-                logger.info("Отключение от клиента " + clientAddr);
-            }
-            readPool.shutdown();
-            processPool.shutdown();
-            sendPool.shutdown();
-            close();
-        });
+            });
+        }
+        readPool.shutdown();
+        processPool.shutdown();
+        sendPool.shutdown();
+        close();
     }
 }
