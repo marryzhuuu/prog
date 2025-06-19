@@ -100,14 +100,14 @@ abstract class UDPServer {
             logger.info("Сервер запущен по адресу " + addr);
 
             while (running) {
-                if (selector.select() > 0) {
+                if (selector.select() > 0) { // селектор создан в конструкторе UDPDatagramServer; ждем данных
                     Set<SelectionKey> selectedKeys = selector.selectedKeys();
                     Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
                     while (keyIterator.hasNext()) {
                         SelectionKey key = keyIterator.next();
                         if (key.isReadable()) {
-                            readPool.submit(() -> handleRead(key));
+                            readPool.submit(() -> handleRead(key)); // читаем данные в отдельном потоке
                         }
                         keyIterator.remove();
                     }
@@ -132,7 +132,7 @@ abstract class UDPServer {
         boolean isLastChunk = false;
 
         try {
-            clientAddr = channel.receive(buffer);
+            clientAddr = channel.receive(buffer); // читаем данные одного пакета
             if (clientAddr == null) return;
 
             buffer.flip();

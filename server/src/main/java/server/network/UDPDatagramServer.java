@@ -21,11 +21,11 @@ public class UDPDatagramServer extends UDPServer {
 
     public UDPDatagramServer(InetAddress address, int port, CommandHandler commandHandler) throws IOException {
         super(new InetSocketAddress(address, port), commandHandler);
-        this.datagramChannel = DatagramChannel.open();
-        this.datagramChannel.configureBlocking(false);
-        this.datagramChannel.bind(getAddr());
-        this.selector = Selector.open();
-        this.datagramChannel.register(selector, SelectionKey.OP_READ);
+        this.datagramChannel = DatagramChannel.open(); // создаем канал
+        this.datagramChannel.configureBlocking(false);  // конфигурируем как неблокирующий
+        this.datagramChannel.bind(getAddr());     // привязываем к сокету на который ждем запросов
+        this.selector = Selector.open();            // открываем селектор - мультиплексор каналов, монитрорящий события
+        this.datagramChannel.register(selector, SelectionKey.OP_READ); // событие, которое нас интересует
     }
 
     @Override

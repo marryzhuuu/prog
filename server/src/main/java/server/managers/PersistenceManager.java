@@ -24,7 +24,7 @@ public class PersistenceManager {
       try {
         var cq = session.getCriteriaBuilder().createQuery(DragonORM.class);
         var rootEntry = cq.from(DragonORM.class);
-        var all = cq.select(rootEntry);
+        var all = cq.select(rootEntry); // создает sql-запрос
 
         var result = session.createQuery(all).getResultList();
         transaction.commit();
